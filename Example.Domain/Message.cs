@@ -12,7 +12,7 @@ namespace Example.Model
         public Message(int id, string message)
             => (Id, this.message) = (id, message);
 
-        public void Process(string testToMatch)
+        public virtual void Process(string testToMatch)
         {
             if (message == testToMatch)
             {
