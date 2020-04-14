@@ -1,14 +1,15 @@
 ﻿using Example.Model;
+using System.Collections.Generic;
 
 namespace Example.Infrastructure
 {
     public class MessageRepository : IMessageRepository
     {
-        private readonly Message[] database = new[] { 
-            new Message(0, "Hello"), 
-            new Message(1, "One"), 
-            new Message(2, "Two"), 
-            new Message(3, "Three") 
+        private readonly Dictionary<int, Message> database = new Dictionary<int, Message> { 
+            [0] = new Message(0, "Hello"), 
+            [1] = new Message(1, "One"), 
+            [2] = new Message(2, "Two"), 
+            [3] = new Message(3, "Three") 
         };
         private readonly IEventWriter bus;
 
