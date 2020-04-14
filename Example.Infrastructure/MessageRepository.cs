@@ -1,6 +1,6 @@
-﻿using Example.Api.Model;
+﻿using Example.Model;
 
-namespace Example.Api.Infrastructure
+namespace Example.Infrastructure
 {
     public class MessageRepository : IMessageRepository
     {

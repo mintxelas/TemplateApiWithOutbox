@@ -1,4 +1,4 @@
-﻿namespace Example.Api.Model
+﻿namespace Example.Model
 {
     public class MatchingMessageReceived : DomainEvent
     {

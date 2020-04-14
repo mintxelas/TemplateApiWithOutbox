@@ -1,8 +1,8 @@
-﻿using Example.Api.Model;
+﻿using Example.Model;
 using Microsoft.Extensions.Logging;
 using System;
 
-namespace Example.Api.Application
+namespace Example.Application
 {
     public class NotificationsContextSubscriptions
     {

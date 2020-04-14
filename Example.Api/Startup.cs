@@ -1,12 +1,11 @@
-using Example.Api.Application;
-using Example.Api.Infrastructure;
-using Example.Api.Model;
+using Example.Application;
+using Example.Infrastructure;
+using Example.Model;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace Example.Api
 {

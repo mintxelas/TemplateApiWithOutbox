@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Example.Api.Model
+namespace Example.Model
 {
     public interface IEventWriter : IDisposable
     {

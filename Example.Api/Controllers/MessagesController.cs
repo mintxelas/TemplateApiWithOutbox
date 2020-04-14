@@ -1,4 +1,4 @@
-﻿using Example.Api.Application;
+﻿using Example.Application;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -20,7 +20,7 @@ namespace Example.Api.Controllers
         [HttpPost("{id}")]
         public void Post(int id)
         {
-            messageService.Process(id);
+            messageService.Process(id, "Hello");
             logger.LogInformation("Processed Post for messageId={id}", id);
         }
     }

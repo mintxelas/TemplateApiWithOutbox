@@ -1,10 +1,9 @@
-﻿using Example.Api.Model;
+﻿using Example.Model;
 
-namespace Example.Api.Application
+namespace Example.Application
 {
     public class MessageProcessingService
     {
-        private const string MessageToMatch = "Hello";
         private readonly IMessageRepository repository;
 
         public MessageProcessingService(IMessageRepository repository)
@@ -12,10 +11,10 @@ namespace Example.Api.Application
             this.repository = repository;
         }
 
-        public void Process(int messageId)
+        public void Process(int messageId, string messageToMatch)
         {
             var message = repository.GetById(messageId);
-            message.Process(MessageToMatch);
+            message.Process(messageToMatch);
             repository.Save(message);
         }
     }

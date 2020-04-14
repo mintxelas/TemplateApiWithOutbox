@@ -1,7 +1,7 @@
-﻿using Example.Api.Model;
+﻿using Example.Model;
 using Microsoft.Extensions.Logging;
 
-namespace Example.Api.Application
+namespace Example.Application
 {
     public class MonitoringContextSubscriptions
     {

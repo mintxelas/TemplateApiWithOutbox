@@ -1,10 +1,10 @@
-﻿using Example.Api.Model;
+﻿using Example.Model;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace Example.Api.Infrastructure
+namespace Example.Infrastructure
 {
     public sealed class InMemoryBus : IEventReader, IEventWriter
     {
