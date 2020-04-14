@@ -11,7 +11,7 @@ namespace Example.Application
             this.repository = repository;
         }
 
-        public void Process(int messageId, string messageToMatch)
+        public virtual void Process(int messageId, string messageToMatch)
         {
             var message = repository.GetById(messageId);
             message.Process(messageToMatch);
