@@ -28,6 +28,7 @@ namespace Example.Api
                 serviceProvider => serviceProvider.GetRequiredService<InMemoryBus>());
             services.AddSingleton<IEventReader>(
                 serviceProvider => serviceProvider.GetRequiredService<InMemoryBus>());
+
             services.AddSingleton<NotificationsContextSubscriptions>();
             services.AddSingleton<MonitoringContextSubscriptions>();
 
