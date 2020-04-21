@@ -26,7 +26,6 @@ namespace Example.Api.Tests
                 services.AddSingleton(BusWriter);
                 services.AddSingleton(BusReader);
                 services.AddScoped(_ => MockMessageRepository);
-
             });
         }
     }

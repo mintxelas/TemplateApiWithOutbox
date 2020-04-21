@@ -1,5 +1,4 @@
 using Example.Model;
-using Microsoft.AspNetCore.Mvc.Testing;
 using NSubstitute;
 using System;
 using System.Threading.Tasks;
@@ -39,6 +38,5 @@ namespace Example.Api.Tests
             factory.BusWriter.Received()
                 .Publish(Arg.Is<MatchingMessageReceived>(e => e.MessageId == SomeMessageId));
         }
-
     }
 }
