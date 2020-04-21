@@ -19,13 +19,13 @@ namespace Example.Api.Tests
             var mockRepository = Substitute.For<IMessageRepository>();
             factory.BusReader = mockBusReader;
             factory.BusWriter = mockBusWriter;
-            factory.MockMessageRepository = mockRepository;
+            factory.MessageRepository = mockRepository;
         }        
 
         [Fact]
         public async Task initialize_subscribers_and_publish_events_on_matching_post()
         {
-            factory.MockMessageRepository
+            factory.MessageRepository
                 .GetById(SomeMessageId)
                 .Returns(new Message(SomeMessageId, "Hello"));
             var client = factory.CreateClient();

@@ -10,7 +10,7 @@ namespace Example.Api.Tests
     {
         public IEventWriter BusWriter { get; set; }
         public IEventReader BusReader { get; set; }
-        public IMessageRepository MockMessageRepository { get; set; }
+        public IMessageRepository MessageRepository { get; set; }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -25,7 +25,7 @@ namespace Example.Api.Tests
 
                 services.AddSingleton(BusWriter);
                 services.AddSingleton(BusReader);
-                services.AddScoped(_ => MockMessageRepository);
+                services.AddScoped(_ => MessageRepository);
             });
         }
     }
