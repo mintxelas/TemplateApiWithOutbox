@@ -11,12 +11,6 @@ namespace Example.Infrastructure
             [2] = new Message(2, "Two"), 
             [3] = new Message(3, "Three") 
         };
-        private readonly IEventWriter bus;
-
-        public MessageRepository(IEventWriter bus)
-        {
-            this.bus = bus;
-        }
 
         public Message GetById(int id)
         {
@@ -26,13 +20,6 @@ namespace Example.Infrastructure
         public void Save(Message message)
         {
             database[message.Id] = message;
-
-            var withEvents = (IExposeEvents)message;
-            foreach(var @event in withEvents.PendingEvents)
-            {
-                bus.Publish(@event);
-            }
-            withEvents.ClearPendingEvents();
         }
     }
 }

@@ -1,27 +1,44 @@
-using Example.Api.Controllers;
-using Example.Application;
 using Example.Model;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc.Testing;
 using NSubstitute;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Example.Api.Tests
 {
-    public class MessagesControllerShould
+    public class MessagesControllerShould : IClassFixture<CustomWebApplicationFactory<Example.Api.Startup>>
     {
-        private const int AnyMessageId = 123;
+        private const int SomeMessageId = 123;
+        private readonly CustomWebApplicationFactory<Startup> factory;
+
+        public MessagesControllerShould(CustomWebApplicationFactory<Startup> factory)
+        {
+            this.factory = factory;
+            var mockBusReader = Substitute.For<IEventReader>();
+            var mockBusWriter = Substitute.For<IEventWriter>();
+            var mockRepository = Substitute.For<IMessageRepository>();
+            factory.BusReader = mockBusReader;
+            factory.BusWriter = mockBusWriter;
+            factory.MockMessageRepository = mockRepository;
+        }        
 
         [Fact]
-        public void relay_post_request_to_messages_service()
+        public async Task initialize_subscribers_and_publish_events_on_matching_post()
         {
-            var repository = Substitute.For<IMessageRepository>();
-            var service = Substitute.For<MessageProcessingService>(new[] { repository });
-            var logger = Substitute.For<ILogger<MessagesController>>();
-            var controller = new MessagesController(service, logger);
+            factory.MockMessageRepository
+                .GetById(SomeMessageId)
+                .Returns(new Message(SomeMessageId, "Hello"));
+            var client = factory.CreateClient();
 
-            controller.Post(AnyMessageId);
+            var response = await client.PostAsync($"/messages/{SomeMessageId}", null);
 
-            service.Received().Process(AnyMessageId, Arg.Any<string>());            
+            response.EnsureSuccessStatusCode(); 
+            factory.BusReader.Received(2)
+                .Subscribe(Arg.Any<Action<MatchingMessageReceived>>());
+            factory.BusWriter.Received()
+                .Publish(Arg.Is<MatchingMessageReceived>(e => e.MessageId == SomeMessageId));
         }
+
     }
 }

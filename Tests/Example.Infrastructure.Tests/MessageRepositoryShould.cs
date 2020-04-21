@@ -1,5 +1,4 @@
 ﻿using Example.Model;
-using NSubstitute;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -9,14 +8,11 @@ namespace Example.Infrastructure.Tests
     public class MessageRepositoryShould
     {
         private readonly MessageRepository repository;
-        private readonly IEventWriter bus;
         private const int ANotPersistedId = 123456;
-        private const string SomeText = "some text";
 
         public MessageRepositoryShould()
         {
-            bus = Substitute.For<IEventWriter>();
-            repository = new MessageRepository(bus);
+            repository = new MessageRepository();
         }
 
         [Fact]
@@ -43,21 +39,6 @@ namespace Example.Infrastructure.Tests
 
             var actualMessage = repository.GetById(expectedMessage.Id);
             Assert.Equal(expectedMessage.Id, actualMessage.Id);            
-        }
-
-        [Fact]
-        public void publish_events_to_bus_when_saving_changes()
-        {
-            var expectedMessage = GivenNotPersistedMessageWithEvents();
-            repository.Save(expectedMessage);
-            bus.Received().Publish(Arg.Any<DomainEvent>());
-        }
-
-        private Message GivenNotPersistedMessageWithEvents()
-        {
-            var msg = new Message(ANotPersistedId, SomeText);
-            msg.Process(SomeText);
-            return msg;
         }
 
         private Message GivenUpdatedMessage()
