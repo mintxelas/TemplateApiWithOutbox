@@ -1,5 +1,5 @@
 ﻿using Example.Application;
-using Example.Model;
+using Example.Domain;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;

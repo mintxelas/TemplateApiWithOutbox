@@ -1,6 +1,6 @@
 using Example.Api.Models;
 using Example.Application;
-using Example.Model;
+using Example.Domain;
 using NSubstitute;
 using System.Text.Json;
 using System.Threading.Tasks;

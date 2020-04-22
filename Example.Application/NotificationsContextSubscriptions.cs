@@ -1,4 +1,4 @@
-﻿using Example.Model;
+﻿using Example.Domain;
 using Microsoft.Extensions.Logging;
 using System;
 

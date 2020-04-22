@@ -1,4 +1,4 @@
-﻿namespace Example.Model
+﻿namespace Example.Domain
 {
     public class MatchingMessageReceived : DomainEvent
     {

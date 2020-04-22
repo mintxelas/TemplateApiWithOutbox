@@ -1,6 +1,6 @@
 using Example.Application;
+using Example.Domain;
 using Example.Infrastructure;
-using Example.Model;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -46,11 +46,19 @@ namespace Example.Api
                 options.SwaggerDoc("v2", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Example API", Version = "v2" });
             });
 
-            services.AddSingleton<InMemoryBus>();
+
+            if (Configuration["UseOutbox"] == "false")
+            {
+                services.AddSingleton<IEventBus, InMemoryBus>();
+            } else
+            {
+                services.AddSingleton<IEventBus, InMemoryBusWithOutbox>();
+            }
+
             services.AddSingleton<IEventWriter>(
-                serviceProvider => serviceProvider.GetRequiredService<InMemoryBus>());
+                serviceProvider => serviceProvider.GetRequiredService<IEventBus>());
             services.AddSingleton<IEventReader>(
-                serviceProvider => serviceProvider.GetRequiredService<InMemoryBus>());
+                serviceProvider => serviceProvider.GetRequiredService<IEventBus>());            
 
             services.AddSingleton<NotificationsContextSubscriptions>();
             services.AddSingleton<MonitoringContextSubscriptions>();

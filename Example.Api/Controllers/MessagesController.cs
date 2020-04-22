@@ -1,6 +1,6 @@
 ﻿using Example.Api.Models;
 using Example.Application;
-using Example.Model;
+using Example.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;

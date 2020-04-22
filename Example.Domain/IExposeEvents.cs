@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Example.Model
+namespace Example.Domain
 {
     public interface IExposeEvents
     {

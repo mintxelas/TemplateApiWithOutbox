@@ -1,4 +1,4 @@
-﻿using Example.Model;
+﻿using Example.Domain;
 using System;
 using System.Collections.Generic;
 using Xunit;

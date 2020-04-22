@@ -1,4 +1,4 @@
-﻿using Example.Model;
+﻿using Example.Domain;
 using System.Collections.Generic;
 
 namespace Example.Infrastructure

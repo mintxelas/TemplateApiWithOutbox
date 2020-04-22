@@ -1,4 +1,4 @@
-﻿using Example.Model;
+﻿using Example.Domain;
 
 namespace Example.Application
 {

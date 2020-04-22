@@ -1,4 +1,4 @@
-﻿using Example.Model;
+﻿using Example.Domain;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Example.Infrastructure
 {
-    public sealed class InMemoryBus : IEventReader, IEventWriter
+    public sealed class InMemoryBus : IEventBus
     {
         private readonly ConcurrentDictionary<Type, List<Action<DomainEvent>>> subscribers 
             = new ConcurrentDictionary<Type, List<Action<DomainEvent>>>();
