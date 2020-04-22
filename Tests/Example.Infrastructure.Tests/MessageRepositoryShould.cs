@@ -11,6 +11,7 @@ namespace Example.Infrastructure.Tests
         private const int ANotPersistedId = 123456;
         private const string SomeText = "Some Text";
         private const int AnExistingMessageId = 0;
+        private const string AChangedText = "changed text";
         private readonly MessageRepository repository;
         private readonly IEventWriter bus;
 
@@ -49,7 +50,7 @@ namespace Example.Infrastructure.Tests
         [Fact]
         public void publish_events_to_bus_when_saving_changes()
         {
-            var givenMessage = new Message(AnExistingMessageId, SomeText);
+            var givenMessage = GivenPersistedMessage();
             givenMessage.Process(SomeText);
 
             repository.Save(givenMessage);
@@ -60,13 +61,13 @@ namespace Example.Infrastructure.Tests
 
         private Message GivenUpdatedMessage()
         {
-            return new Message(AnExistingMessageId, "changed text");
+            return new Message(AnExistingMessageId, AChangedText);
         }
 
         private Message GivenPersistedMessage()
         {
             // I know this message is in the sample repo. 
-            return new Message(AnExistingMessageId, "Hello");
+            return new Message(AnExistingMessageId, SomeText);
         }
     }
 }

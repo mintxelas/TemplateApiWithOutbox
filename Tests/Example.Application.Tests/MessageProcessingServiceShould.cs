@@ -9,14 +9,11 @@ namespace Example.Application.Tests
         private const string AMessage = "a message";
         private const string AnyMessage = "any message";
         private const int AMessageId = 0;
-
         private readonly IMessageRepository repository;
-        private readonly IEventWriter bus;
 
         public MessageProcessingServiceShould()
         {
             repository = Substitute.For<IMessageRepository>();
-            bus = Substitute.For<IEventWriter>();
         }
 
         [Fact]
