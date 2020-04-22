@@ -13,15 +13,9 @@ namespace Example.Infrastructure
         };
         private readonly IEventWriter bus;
 
-        public MessageRepository(IEventWriter bus)
-        {
-            this.bus = bus;
-        }
+        public MessageRepository(IEventWriter bus) => this.bus = bus;
 
-        public Message GetById(int id)
-        {
-            return database[id];
-        }
+        public Message GetById(int id) => database[id];
 
         public void Save(Message message)
         {
