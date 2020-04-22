@@ -12,9 +12,9 @@ namespace Example.Infrastructure
             = new ConcurrentDictionary<Type, List<Action<DomainEvent>>>();
         private readonly System.Threading.Timer timer;
         private readonly ILogger<BusReaderWithOutbox> logger;
-        private readonly OutboxRepository repository;
+        private readonly OutboxInMemoryRepository repository;
 
-        public BusReaderWithOutbox(ILogger<BusReaderWithOutbox> logger, OutboxRepository repository)
+        public BusReaderWithOutbox(ILogger<BusReaderWithOutbox> logger, OutboxInMemoryRepository repository)
         {
             this.logger = logger;
             this.repository = repository;
@@ -37,7 +37,7 @@ namespace Example.Infrastructure
 
         private void OnTick(object state)
         {
-            foreach (var @event in repository.DequeuePendingEvents())
+            foreach (var @event in repository.PendingEvents())
             {
                 Send(@event);
             }

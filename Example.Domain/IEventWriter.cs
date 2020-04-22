@@ -2,7 +2,7 @@
 
 namespace Example.Domain
 {
-    public interface IEventWriter : IDisposable
+    public interface IEventWriter 
     {
         void Publish(DomainEvent domainEvent);
     }

@@ -10,13 +10,13 @@ namespace Example.Infrastructure.Tests
     public class InMemoryBusWithOutboxShould
     {
         private readonly ILogger<BusReaderWithOutbox> logger;
-        private readonly OutboxRepository busWriter;
+        private readonly OutboxInMemoryRepository busWriter;
         private readonly BusReaderWithOutbox busReader;
 
         public InMemoryBusWithOutboxShould()
         {
             logger = Substitute.For<ILogger<BusReaderWithOutbox>>();
-            busWriter = new OutboxRepository();
+            busWriter = new OutboxInMemoryRepository();
             busReader = new BusReaderWithOutbox(logger, busWriter);
         }
 

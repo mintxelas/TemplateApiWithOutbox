@@ -19,7 +19,7 @@ namespace Example.Api.Tests
             this.factory = factory;
             var mockRepository = Substitute.For<IMessageRepository>();
             factory.MessageRepository = mockRepository;
-            var mockService = Substitute.For<MessageProcessingService>(new object[] { null, null });
+            var mockService = Substitute.For<MessageProcessingService>(new object[] { null });
             factory.MessageProcessingService = mockService;
         }
 

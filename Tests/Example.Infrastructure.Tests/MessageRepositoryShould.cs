@@ -1,4 +1,5 @@
 ﻿using Example.Domain;
+using NSubstitute;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -7,12 +8,16 @@ namespace Example.Infrastructure.Tests
 {
     public class MessageRepositoryShould
     {
-        private readonly MessageRepository repository;
         private const int ANotPersistedId = 123456;
+        private const string SomeText = "Some Text";
+        private const int AnExistingMessageId = 0;
+        private readonly MessageRepository repository;
+        private readonly IEventWriter bus;
 
         public MessageRepositoryShould()
         {
-            repository = new MessageRepository();
+            bus = Substitute.For<IEventWriter>();
+            repository = new MessageRepository(bus);
         }
 
         [Fact]
@@ -38,18 +43,30 @@ namespace Example.Infrastructure.Tests
             repository.Save(expectedMessage);
 
             var actualMessage = repository.GetById(expectedMessage.Id);
-            Assert.Equal(expectedMessage.Id, actualMessage.Id);            
+            Assert.Equal(expectedMessage.Id, actualMessage.Id);
+        }
+
+        [Fact]
+        public void publish_events_to_bus_when_saving_changes()
+        {
+            var givenMessage = new Message(AnExistingMessageId, SomeText);
+            givenMessage.Process(SomeText);
+
+            repository.Save(givenMessage);
+            
+            bus.Received().Publish(Arg.Is<MatchingMessageReceived>(e =>
+                e.MessageId == AnExistingMessageId));
         }
 
         private Message GivenUpdatedMessage()
         {
-            return new Message(0, "changed text");
+            return new Message(AnExistingMessageId, "changed text");
         }
 
         private Message GivenPersistedMessage()
         {
             // I know this message is in the sample repo. 
-            return new Message(0, "Hello");
+            return new Message(AnExistingMessageId, "Hello");
         }
     }
 }

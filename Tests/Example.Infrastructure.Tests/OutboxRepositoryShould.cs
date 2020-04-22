@@ -6,11 +6,11 @@ namespace Example.Infrastructure.Tests
 {
     public class OutboxRepositoryShould
     {
-        private readonly OutboxRepository repository;
+        private readonly OutboxInMemoryRepository repository;
 
         public OutboxRepositoryShould()
         {
-            repository = new OutboxRepository();
+            repository = new OutboxInMemoryRepository();
         }
 
         [Fact]
@@ -20,7 +20,7 @@ namespace Example.Infrastructure.Tests
 
             repository.Publish(givenEvent);
 
-            var actualEvents = repository.DequeuePendingEvents();
+            var actualEvents = repository.PendingEvents();
             Assert.Single(actualEvents.Where(e => e == givenEvent));
         }
 
@@ -32,7 +32,7 @@ namespace Example.Infrastructure.Tests
             repository.Publish(givenEvent1);
             repository.Publish(givenEvent2);
 
-            var actualEvents = repository.DequeuePendingEvents().ToArray();
+            var actualEvents = repository.PendingEvents().ToArray();
 
             Assert.Contains(givenEvent1, actualEvents);
             Assert.Contains(givenEvent2, actualEvents);
@@ -45,10 +45,10 @@ namespace Example.Infrastructure.Tests
             var givenEvent1 = new MockEvent();
             var givenEvent2 = new MockEvent();
             repository.Publish(givenEvent1);
-            _ = repository.DequeuePendingEvents().ToArray();
+            _ = repository.PendingEvents().ToArray();
             repository.Publish(givenEvent2);
 
-            var actualEvents = repository.DequeuePendingEvents().ToArray();
+            var actualEvents = repository.PendingEvents().ToArray();
 
             Assert.DoesNotContain(givenEvent1, actualEvents);
             Assert.Contains(givenEvent2, actualEvents);

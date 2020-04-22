@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Example.Infrastructure
 {
-    public class OutboxRepository : IEventWriter
+    public class OutboxInMemoryRepository : IEventWriter
     {
         private readonly ConcurrentQueue<DomainEvent> queue = new ConcurrentQueue<DomainEvent>();
 
@@ -13,16 +13,12 @@ namespace Example.Infrastructure
             queue.Enqueue(@event);
         }
 
-        public virtual IEnumerable<DomainEvent> DequeuePendingEvents()
+        public virtual IEnumerable<DomainEvent> PendingEvents()
         {
             while (queue.TryDequeue(out var @event))
             {
                 yield return @event;
             }
-        }
-
-        public void Dispose()
-        {
         }
     }
 }
