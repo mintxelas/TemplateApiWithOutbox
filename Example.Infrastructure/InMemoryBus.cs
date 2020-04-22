@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Example.Infrastructure
 {
-    public sealed class InMemoryBus : IEventBus
+    public sealed class InMemoryBus : IEventReader, IEventWriter
     {
         private readonly ConcurrentDictionary<Type, List<Action<DomainEvent>>> subscribers 
             = new ConcurrentDictionary<Type, List<Action<DomainEvent>>>();

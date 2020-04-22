@@ -6,15 +6,15 @@ using System.Collections.Generic;
 
 namespace Example.Infrastructure
 {
-    public sealed class InMemoryBusWithOutbox : IEventBus
+    public sealed class BusReaderWithOutbox : IEventReader
     {
         private readonly ConcurrentDictionary<Type, List<Action<DomainEvent>>> subscribers 
             = new ConcurrentDictionary<Type, List<Action<DomainEvent>>>();
         private readonly System.Threading.Timer timer;
-        private readonly ILogger<InMemoryBusWithOutbox> logger;
+        private readonly ILogger<BusReaderWithOutbox> logger;
         private readonly OutboxRepository repository;
 
-        public InMemoryBusWithOutbox(ILogger<InMemoryBusWithOutbox> logger, OutboxRepository repository)
+        public BusReaderWithOutbox(ILogger<BusReaderWithOutbox> logger, OutboxRepository repository)
         {
             this.logger = logger;
             this.repository = repository;
@@ -33,11 +33,6 @@ namespace Example.Infrastructure
                         handlers.Add(wrapper);
                         return handlers;
                     });
-        }
-
-        public void Publish(DomainEvent @event)
-        {
-            repository.Enqueue(@event);
         }
 
         private void OnTick(object state)

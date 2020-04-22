@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace Example.Infrastructure
 {
-    public class OutboxRepository
+    public class OutboxRepository : IEventWriter
     {
         private readonly ConcurrentQueue<DomainEvent> queue = new ConcurrentQueue<DomainEvent>();
 
-        public virtual void Enqueue(DomainEvent @event)
+        public virtual void Publish(DomainEvent @event)
         {
             queue.Enqueue(@event);
         }
@@ -21,6 +21,8 @@ namespace Example.Infrastructure
             }
         }
 
-
+        public void Dispose()
+        {
+        }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using Example.Domain;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -20,7 +18,7 @@ namespace Example.Infrastructure.Tests
         {
             var givenEvent = new MockEvent();
 
-            repository.Enqueue(givenEvent);
+            repository.Publish(givenEvent);
 
             var actualEvents = repository.DequeuePendingEvents();
             Assert.Single(actualEvents.Where(e => e == givenEvent));
@@ -31,8 +29,8 @@ namespace Example.Infrastructure.Tests
         {
             var givenEvent1 = new MockEvent();
             var givenEvent2 = new MockEvent();
-            repository.Enqueue(givenEvent1);
-            repository.Enqueue(givenEvent2);
+            repository.Publish(givenEvent1);
+            repository.Publish(givenEvent2);
 
             var actualEvents = repository.DequeuePendingEvents().ToArray();
 
@@ -46,9 +44,9 @@ namespace Example.Infrastructure.Tests
         {
             var givenEvent1 = new MockEvent();
             var givenEvent2 = new MockEvent();
-            repository.Enqueue(givenEvent1);
+            repository.Publish(givenEvent1);
             _ = repository.DequeuePendingEvents().ToArray();
-            repository.Enqueue(givenEvent2);
+            repository.Publish(givenEvent2);
 
             var actualEvents = repository.DequeuePendingEvents().ToArray();
 

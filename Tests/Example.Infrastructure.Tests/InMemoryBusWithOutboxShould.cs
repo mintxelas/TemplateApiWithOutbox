@@ -9,39 +9,41 @@ namespace Example.Infrastructure.Tests
 {
     public class InMemoryBusWithOutboxShould
     {
-        private readonly ILogger<InMemoryBusWithOutbox> logger;
-        private readonly InMemoryBusWithOutbox bus;
+        private readonly ILogger<BusReaderWithOutbox> logger;
+        private readonly OutboxRepository busWriter;
+        private readonly BusReaderWithOutbox busReader;
 
         public InMemoryBusWithOutboxShould()
         {
-            logger = Substitute.For<ILogger<InMemoryBusWithOutbox>>();
-            bus = new InMemoryBusWithOutbox(logger, new OutboxRepository());
+            logger = Substitute.For<ILogger<BusReaderWithOutbox>>();
+            busWriter = new OutboxRepository();
+            busReader = new BusReaderWithOutbox(logger, busWriter);
         }
 
         [Fact]
-        public void contain_references_to_subscribers()
+        public void contain_references_to_subscribers_in_bus_reader()
         {
             var invoked = false;
             var domainEvent = new MockEvent();
             Action<MockEvent> handler = (evt) => invoked = true;
-            bus.Subscribe(handler);
+            busReader.Subscribe(handler);
 
-            bus.Publish(domainEvent);
+            busWriter.Publish(domainEvent);
             Thread.Sleep(6 * 1000);
 
             Assert.True(invoked);
         }
 
         [Fact]
-        public void invoke_subscribers_when_events_are_published()
+        public void invoke_subscribers_from_bus_reader_when_events_are_published_by_bus_writer()
         {
             var invokedTimes = 0;
             var domainEvent = new MockEvent();
             Action<MockEvent> handler = (evt) => invokedTimes += 1;
-            bus.Subscribe(handler);
+            busReader.Subscribe(handler);
 
-            bus.Publish(domainEvent);
-            bus.Publish(domainEvent);
+            busWriter.Publish(domainEvent);
+            busWriter.Publish(domainEvent);
             Thread.Sleep(6 * 1000);
 
             Assert.Equal(2, invokedTimes);

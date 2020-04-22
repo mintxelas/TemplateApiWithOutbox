@@ -13,32 +13,32 @@ namespace Example.Api
 {
     public class Startup
     {
+        private readonly IConfiguration configuration;
+
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            this.configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddApiVersioning(
-                options =>
-                {
-                    options.ReportApiVersions = true;
-                    options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
-                    options.AssumeDefaultVersionWhenUnspecified = true;
-                    options.ApiVersionReader = ApiVersionReader.Combine(
-                        new HeaderApiVersionReader("X-version"),
-                        new QueryStringApiVersionReader("api-version"));
-                });
-            services.AddVersionedApiExplorer(
-                options =>
-                {
-                    options.GroupNameFormat = "'v'VVV";
-                });
+
+            services.AddApiVersioning(options =>
+            {
+                options.ReportApiVersions = true;
+                options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.ApiVersionReader = ApiVersionReader.Combine(
+                    new HeaderApiVersionReader("X-version"),
+                    new QueryStringApiVersionReader("api-version"));
+            });
+
+            services.AddVersionedApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'VVV";
+            });
 
             services.AddSwaggerGen(options =>
             {
@@ -47,18 +47,21 @@ namespace Example.Api
             });
 
 
-            if (Configuration["UseOutbox"] == "false")
+            if (configuration["UseOutbox"] == "true")
             {
-                services.AddSingleton<IEventBus, InMemoryBus>();
-            } else
-            {
-                services.AddSingleton<IEventBus, InMemoryBusWithOutbox>();
+                services.AddSingleton<OutboxRepository>();
+                services.AddSingleton<IEventReader, BusReaderWithOutbox>();
+                services.AddScoped<IEventWriter>(
+                    serviceProvider => serviceProvider.GetRequiredService<OutboxRepository>());
             }
-
-            services.AddSingleton<IEventWriter>(
-                serviceProvider => serviceProvider.GetRequiredService<IEventBus>());
-            services.AddSingleton<IEventReader>(
-                serviceProvider => serviceProvider.GetRequiredService<IEventBus>());            
+            else
+            {
+                services.AddSingleton<InMemoryBus>();
+                services.AddSingleton<IEventWriter>(
+                    serviceProvider => serviceProvider.GetRequiredService<InMemoryBus>());
+                services.AddSingleton<IEventReader>(
+                    serviceProvider => serviceProvider.GetRequiredService<InMemoryBus>());
+            }
 
             services.AddSingleton<NotificationsContextSubscriptions>();
             services.AddSingleton<MonitoringContextSubscriptions>();
@@ -68,14 +71,14 @@ namespace Example.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider, 
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider,
             NotificationsContextSubscriptions notificationsContext, MonitoringContextSubscriptions monitoringContext)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-            
+
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
