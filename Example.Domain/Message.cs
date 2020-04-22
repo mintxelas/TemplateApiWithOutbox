@@ -5,25 +5,24 @@ namespace Example.Model
     public class Message: IExposeEvents
     {
         private readonly List<DomainEvent> pendingEvents = new List<DomainEvent>();
-        private readonly string message;
-
+        
         public int Id { get; }
+
+        public string Text { get; }
         
         public Message(int id, string message)
-            => (Id, this.message) = (id, message);
+            => (Id, Text) = (id, message);
 
         public virtual void Process(string testToMatch)
         {
-            if (message == testToMatch)
+            if (Text == testToMatch)
             {
                 pendingEvents.Add(new MatchingMessageReceived(Id));
             }
         }
 
-        void IExposeEvents.ClearPendingEvents()
-        {
-            pendingEvents.Clear();
-        }
+        void IExposeEvents.ClearPendingEvents() 
+            => pendingEvents.Clear();
 
         IEnumerable<DomainEvent> IExposeEvents.PendingEvents 
             => pendingEvents.ToArray();

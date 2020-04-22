@@ -1,7 +1,9 @@
-﻿using Example.Application;
+﻿using Example.Api.Models;
+using Example.Application;
 using Example.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace Example.Api.Controllers
 {
@@ -23,9 +25,10 @@ namespace Example.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Message> Get([FromRoute] int id)
+        public ActionResult<MessageDto> Get([FromRoute] int id)
         {
-            return Ok(repository.GetById(id));
+            var message = repository.GetById(id);
+            return Ok(ToDto(message));
         }
 
         [MapToApiVersion("1.0")]
@@ -33,7 +36,7 @@ namespace Example.Api.Controllers
         public IActionResult Post([FromRoute] int id)
         {
             messageService.Process(id, "Hello");
-            logger.LogInformation("Processed Post for messageId={id}", id);
+            logger.LogInformation("Processed PostV1 for messageId={id}", id);
             return Ok();
         }
 
@@ -46,6 +49,7 @@ namespace Example.Api.Controllers
             return Ok();
         }
 
-
+        private MessageDto ToDto(Message message)
+            => new MessageDto { id = message.Id, text = message.Text };
     }
 }

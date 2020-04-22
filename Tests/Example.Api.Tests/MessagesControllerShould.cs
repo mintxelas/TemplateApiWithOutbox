@@ -1,45 +1,62 @@
+using Example.Api.Models;
+using Example.Application;
 using Example.Model;
 using NSubstitute;
-using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace Example.Api.Tests
 {
-    public class MessagesControllerShould : IClassFixture<CustomWebApplicationFactory<Example.Api.Startup>>
+    public class MessagesControllerShould : IClassFixture<CustomWebApplicationFactory<Startup>>
     {
-        private const int SomeMessageId = 123;
+        private const int SomeId = 123;
+        private const string SomeText = "some text";
         private readonly CustomWebApplicationFactory<Startup> factory;
 
         public MessagesControllerShould(CustomWebApplicationFactory<Startup> factory)
         {
             this.factory = factory;
-            var mockBusReader = Substitute.For<IEventReader>();
-            var mockBusWriter = Substitute.For<IEventWriter>();
             var mockRepository = Substitute.For<IMessageRepository>();
-            factory.BusReader = mockBusReader;
-            factory.BusWriter = mockBusWriter;
             factory.MessageRepository = mockRepository;
-        }        
-
-        [Fact]
-        public async Task initialize_subscribers_and_publish_events_on_matching_post()
-        {
-            factory.MessageRepository
-                .GetById(SomeMessageId)
-                .Returns(new Message(SomeMessageId, "Hello"));
-            var client = factory.CreateClient();
-
-            var response = await client.PostAsync($"/messages/{SomeMessageId}", null);
-
-            response.EnsureSuccessStatusCode(); 
-            factory.BusReader.Received(2)
-                .Subscribe(Arg.Any<Action<MatchingMessageReceived>>());
-            factory.BusWriter.Received()
-                .Publish(Arg.Is<MatchingMessageReceived>(e => e.MessageId == SomeMessageId));
+            var mockService = Substitute.For<MessageProcessingService>(new object[] { null, null });
+            factory.MessageProcessingService = mockService;
         }
 
-        // TODO write tests for v1 and v2 POST
-        // TODO write test for GET
+        [Fact]
+        public async Task return_the_corresponding_message_given_an_id_on_get()
+        {
+            factory.MessageRepository
+                    .GetById(SomeId)
+                    .Returns(new Message(SomeId, SomeText));
+            var client = factory.CreateClient();
+
+            var response = await client.GetAsync($"/messages/{SomeId}");
+
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            var actualMessage = JsonSerializer.Deserialize<MessageDto>(responseString);
+            Assert.Equal(SomeId, actualMessage.id);
+            Assert.Equal(SomeText, actualMessage.text);
+        }
+
+        [Fact]
+        public Task use_processing_service_on_post_v1() 
+            => use_processing_service_on_post("1.0", "Hello");
+
+        [Fact]
+        public Task use_processing_service_on_post_v2() 
+            => use_processing_service_on_post("2.0", "World");
+
+        private async Task use_processing_service_on_post(string version, string matchingWord)
+        {
+            var client = factory.CreateClient();
+            client.DefaultRequestHeaders.Add("X-version", version);
+
+            var response = await client.PostAsync($"/messages/{SomeId}", null);
+
+            response.EnsureSuccessStatusCode();
+            factory.MessageProcessingService.Received().Process(SomeId, matchingWord);  
+        }   
     }
 }
