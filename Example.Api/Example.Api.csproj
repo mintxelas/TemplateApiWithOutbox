@@ -6,6 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="4.1.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.3.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Example.Application\Example.Application.csproj" />
     <ProjectReference Include="..\Example.Infrastructure\Example.Infrastructure.csproj" />
   </ItemGroup>

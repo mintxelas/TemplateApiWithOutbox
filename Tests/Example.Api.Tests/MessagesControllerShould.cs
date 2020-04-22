@@ -38,5 +38,8 @@ namespace Example.Api.Tests
             factory.BusWriter.Received()
                 .Publish(Arg.Is<MatchingMessageReceived>(e => e.MessageId == SomeMessageId));
         }
+
+        // TODO write tests for v1 and v2 POST
+        // TODO write test for GET
     }
 }
