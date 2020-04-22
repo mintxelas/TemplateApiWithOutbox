@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Example.Api
 {
@@ -48,8 +49,12 @@ namespace Example.Api
 
             if (configuration["UseOutbox"] == "true")
             {
-                services.AddSingleton<IOutboxRepository, OutboxInMemoryRepository>();
-                services.AddSingleton<IEventReader, BusReaderWithOutbox>();
+                services.AddScoped<ExampleDbContext>();
+                services.AddScoped<IOutboxRepository, OutboxSqLiteRepository>();
+                services.AddSingleton<IEventReader>(
+                    serviceProvider => new BusReaderWithOutbox(
+                        serviceProvider.GetRequiredService<ILogger<BusReaderWithOutbox>>(),
+                        new OutboxSqLiteRepository(new ExampleDbContext())));
                 services.AddScoped<IEventWriter>(
                     serviceProvider => serviceProvider.GetRequiredService<IOutboxRepository>());
             }
@@ -62,8 +67,8 @@ namespace Example.Api
                     serviceProvider => serviceProvider.GetRequiredService<InMemoryBus>());
             }
 
-            services.AddSingleton<NotificationsContextSubscriptions>();
-            services.AddSingleton<MonitoringContextSubscriptions>();
+            services.AddTransient<NotificationsContextSubscriptions>();
+            services.AddTransient<MonitoringContextSubscriptions>();
 
             services.AddScoped<MessageProcessingService>();
             services.AddScoped<IMessageRepository, MessageRepository>();

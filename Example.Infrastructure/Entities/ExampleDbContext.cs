@@ -15,8 +15,8 @@ namespace Example.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<MessageRecord>().ToTable("Messages");
-            modelBuilder.Entity<OutboxEvent>().ToTable("Outbox");
+            modelBuilder.Entity<MessageRecord>().ToTable("Messages").HasKey(m => m.Id);
+            modelBuilder.Entity<OutboxEvent>().ToTable("Outbox").HasNoKey();
         }
     }
 }
