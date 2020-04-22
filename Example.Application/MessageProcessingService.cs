@@ -1,4 +1,5 @@
 ﻿using Example.Domain;
+using System.Threading.Tasks;
 
 namespace Example.Application
 {
@@ -11,11 +12,11 @@ namespace Example.Application
             this.repository = repository;
         }
 
-        public virtual void Process(int messageId, string messageToMatch)
+        public virtual async Task Process(int messageId, string messageToMatch)
         {
-            var message = repository.GetById(messageId);
+            var message = await repository.GetById(messageId);
             message.Process(messageToMatch);
-            repository.Save(message);            
+            await repository.Save(message);            
         }
     }
 }

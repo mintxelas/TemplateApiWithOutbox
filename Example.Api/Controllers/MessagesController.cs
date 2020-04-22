@@ -4,6 +4,7 @@ using Example.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Threading.Tasks;
 
 namespace Example.Api.Controllers
 {
@@ -25,26 +26,26 @@ namespace Example.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<MessageDto> Get([FromRoute] int id)
+        public async Task<ActionResult<MessageDto>> Get([FromRoute] int id)
         {
-            var message = repository.GetById(id);
+            var message = await repository.GetById(id);
             return Ok(ToDto(message));
         }
 
         [MapToApiVersion("1.0")]
         [HttpPost("{id}")]
-        public IActionResult Post([FromRoute] int id)
+        public async Task<IActionResult> Post([FromRoute] int id)
         {
-            messageService.Process(id, "Hello");
+            await messageService.Process(id, "Hello");
             logger.LogInformation("Processed PostV1 for messageId={id}", id);
             return Ok();
         }
 
         [MapToApiVersion("2.0")]
         [HttpPost("{id}")]
-        public IActionResult PostV2([FromRoute] int id)
+        public async Task<IActionResult> PostV2([FromRoute] int id)
         {
-            messageService.Process(id, "World");
+            await messageService.Process(id, "World");
             logger.LogInformation("Processed PostV2 for messageId={id}", id);
             return Ok();
         }

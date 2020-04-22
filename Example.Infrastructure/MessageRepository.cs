@@ -1,5 +1,6 @@
 ﻿using Example.Domain;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Example.Infrastructure
 {
@@ -15,9 +16,10 @@ namespace Example.Infrastructure
 
         public MessageRepository(IEventWriter bus) => this.bus = bus;
 
-        public Message GetById(int id) => database[id];
+        public Task<Message> GetById(int id) 
+            => Task.FromResult(database[id]);
 
-        public void Save(Message message)
+        public Task Save(Message message)
         {
             database[message.Id] = message;
             var withEvents = (IExposeEvents)message;
@@ -26,6 +28,7 @@ namespace Example.Infrastructure
                 bus.Publish(@event);
             }
             withEvents.ClearPendingEvents();
+            return Task.CompletedTask;
         }
     }
 }

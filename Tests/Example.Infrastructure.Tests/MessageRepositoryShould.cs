@@ -2,6 +2,7 @@
 using NSubstitute;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Example.Infrastructure.Tests
@@ -22,38 +23,38 @@ namespace Example.Infrastructure.Tests
         }
 
         [Fact]
-        public void retrieve_a_message_by_its_id()
+        public async Task retrieve_a_message_by_its_id()
         {
             var expectedMessage = GivenPersistedMessage();
-            var actualMessage = repository.GetById(expectedMessage.Id);
+            var actualMessage = await repository.GetById(expectedMessage.Id);
             Assert.Equal(expectedMessage.Id, actualMessage.Id);
         }
 
         [Fact]
         public void throw_key_not_found_exception_when_message_is_not_in_database()
         {
-            Action getAction = () => repository.GetById(ANotPersistedId);
+            Action getAction = () => _ = repository.GetById(ANotPersistedId).Result;
             Assert.Throws<KeyNotFoundException>(getAction);
         }
 
         [Fact]
-        public void store_a_message()
+        public async Task store_a_message()
         {
             var expectedMessage = GivenUpdatedMessage();
 
-            repository.Save(expectedMessage);
+            await repository.Save(expectedMessage);
 
-            var actualMessage = repository.GetById(expectedMessage.Id);
+            var actualMessage = await repository.GetById(expectedMessage.Id);
             Assert.Equal(expectedMessage.Id, actualMessage.Id);
         }
 
         [Fact]
-        public void publish_events_to_bus_when_saving_changes()
+        public async Task publish_events_to_bus_when_saving_changes()
         {
             var givenMessage = GivenPersistedMessage();
             givenMessage.Process(SomeText);
 
-            repository.Save(givenMessage);
+            await repository.Save(givenMessage);
             
             bus.Received().Publish(Arg.Is<MatchingMessageReceived>(e =>
                 e.MessageId == AnExistingMessageId));

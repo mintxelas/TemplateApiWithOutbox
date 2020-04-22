@@ -12,9 +12,9 @@ namespace Example.Infrastructure
             = new ConcurrentDictionary<Type, List<Action<DomainEvent>>>();
         private readonly System.Threading.Timer timer;
         private readonly ILogger<BusReaderWithOutbox> logger;
-        private readonly OutboxInMemoryRepository repository;
+        private readonly IOutboxRepository repository;
 
-        public BusReaderWithOutbox(ILogger<BusReaderWithOutbox> logger, OutboxInMemoryRepository repository)
+        public BusReaderWithOutbox(ILogger<BusReaderWithOutbox> logger, IOutboxRepository repository)
         {
             this.logger = logger;
             this.repository = repository;

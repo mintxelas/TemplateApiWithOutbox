@@ -1,8 +1,10 @@
-﻿namespace Example.Domain
+﻿using System.Threading.Tasks;
+
+namespace Example.Domain
 {
     public interface IMessageRepository
     {
-        Message GetById(int id);
-        void Save(Message message);
+        Task<Message> GetById(int id);
+        Task Save(Message message);
     }
 }

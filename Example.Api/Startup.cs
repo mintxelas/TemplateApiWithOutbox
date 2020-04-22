@@ -48,10 +48,10 @@ namespace Example.Api
 
             if (configuration["UseOutbox"] == "true")
             {
-                services.AddSingleton<OutboxInMemoryRepository>();
+                services.AddSingleton<IOutboxRepository, OutboxInMemoryRepository>();
                 services.AddSingleton<IEventReader, BusReaderWithOutbox>();
                 services.AddScoped<IEventWriter>(
-                    serviceProvider => serviceProvider.GetRequiredService<OutboxInMemoryRepository>());
+                    serviceProvider => serviceProvider.GetRequiredService<IOutboxRepository>());
             }
             else
             {

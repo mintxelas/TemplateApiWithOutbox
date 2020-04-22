@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Example.Infrastructure
 {
-    public class OutboxInMemoryRepository : IEventWriter
+    public class OutboxInMemoryRepository : IOutboxRepository
     {
         private readonly ConcurrentQueue<DomainEvent> queue = new ConcurrentQueue<DomainEvent>();
 
