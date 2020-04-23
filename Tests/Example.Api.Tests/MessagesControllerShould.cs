@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
 using Example.Api.Models;
 using Example.Application;
 using Example.Domain;
@@ -10,9 +13,10 @@ namespace Example.Api.Tests
 {
     public class MessagesControllerShould : IClassFixture<CustomWebApplicationFactory<Startup>>
     {
-        private const int SomeId = 123;
         private const string SomeText = "some text";
+        private static readonly Guid SomeId = Guid.NewGuid();
         private readonly CustomWebApplicationFactory<Startup> factory;
+        private readonly HttpClient client;
 
         public MessagesControllerShould(CustomWebApplicationFactory<Startup> factory)
         {
@@ -21,6 +25,7 @@ namespace Example.Api.Tests
             factory.MessageRepository = mockRepository;
             var mockService = Substitute.For<MessageProcessingService>(new object[] { null });
             factory.MessageProcessingService = mockService;
+            client = this.factory.CreateClient();
         }
 
         [Fact]
@@ -29,7 +34,6 @@ namespace Example.Api.Tests
             factory.MessageRepository
                     .GetById(SomeId)
                     .Returns(new Message(SomeId, SomeText));
-            var client = factory.CreateClient();
 
             var response = await client.GetAsync($"/messages/{SomeId}");
 
@@ -41,19 +45,31 @@ namespace Example.Api.Tests
         }
 
         [Fact]
-        public Task use_processing_service_on_post_v1() 
-            => use_processing_service_on_post("1.0", "Hello");
+        public async Task create_a_message_on_post()
+        {
+            var requestContent = new FormUrlEncodedContent(new [] {
+                new KeyValuePair<string, string>("text", SomeText)
+            });
+
+            var response = await client.PostAsync("/messages", requestContent);
+
+            response.EnsureSuccessStatusCode();
+            await factory.MessageProcessingService.Received().Create(SomeText);
+        }
 
         [Fact]
-        public Task use_processing_service_on_post_v2() 
-            => use_processing_service_on_post("2.0", "World");
+        public Task use_processing_service_on_put_v1() 
+            => use_processing_service_on_put("1.0", "Hello");
 
-        private async Task use_processing_service_on_post(string version, string matchingWord)
+        [Fact]
+        public Task use_processing_service_on_put_v2() 
+            => use_processing_service_on_put("2.0", "World");
+
+        private async Task use_processing_service_on_put(string version, string matchingWord)
         {
-            var client = factory.CreateClient();
             client.DefaultRequestHeaders.Add("X-version", version);
 
-            var response = await client.PostAsync($"/messages/{SomeId}", null);
+            var response = await client.PutAsync($"/messages/process/{SomeId}", null);
 
             response.EnsureSuccessStatusCode();
             await factory.MessageProcessingService.Received().Process(SomeId, matchingWord);  

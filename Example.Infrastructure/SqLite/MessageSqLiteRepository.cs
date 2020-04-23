@@ -14,14 +14,14 @@ namespace Example.Infrastructure.SqLite
         public MessageSqLiteRepository(ExampleDbContext dbContext) 
             => this.dbContext = dbContext;
 
-        public Task<Message> GetById(int id)
+        public Task<Message> GetById(Guid id)
             => Task.FromResult(ToMessage(dbContext.MessageRecord
                     .SingleOrDefault(m => m.Id == id)));
 
-        public async Task<int> Save(Message message)
+        public async Task Save(Message message)
         {
             var record = ToRecord(message);
-            if (message.Id < 0)
+            if (message.Id == default)
             {
                 await dbContext.MessageRecord.AddAsync(record);
             }
@@ -44,8 +44,6 @@ namespace Example.Infrastructure.SqLite
             withEvents.ClearPendingEvents();
 
             await dbContext.SaveChangesAsync();
-
-            return record.Id;
         }
 
         private Message ToMessage(MessageRecord record)
@@ -56,6 +54,7 @@ namespace Example.Infrastructure.SqLite
         private MessageRecord ToRecord(Message message)
             => new MessageRecord
                {
+                   Id = message.Id == default ? Guid.NewGuid() : message.Id,
                    Text = message.Text
                };
     }

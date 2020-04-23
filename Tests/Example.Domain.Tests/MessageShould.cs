@@ -1,3 +1,4 @@
+using System;
 using Example.Domain;
 using System.Linq;
 using Xunit;
@@ -6,14 +7,14 @@ namespace Example.Domain.Tests
 {
     public class MessageShould
     {
-        private const int SomeMessageId = 123456;
+        private static readonly Guid SomeMessageId = Guid.NewGuid();
         private const string SomeExpectedText = "given text";
         private const string SomeUnexpectedText = "unexpected text";
 
         [Fact]
         public void publish_an_event_when_message_text_and_searched_text_match()
         {
-            var expectedEvent = new MatchingMessageReceived(SomeMessageId);
+            var expectedEvent = new MatchingMessageReceived() { MessageId = SomeMessageId };
             var message = new Message(SomeMessageId, SomeExpectedText);
 
             message.Process(SomeExpectedText);

@@ -1,7 +1,9 @@
-﻿namespace Example.Domain
+﻿using System;
+
+namespace Example.Domain
 {
     public class MatchingMessageReceived : DomainEvent
     {
-        public int MessageId { get; set; }
+        public Guid MessageId { get; set; }
     }
 }

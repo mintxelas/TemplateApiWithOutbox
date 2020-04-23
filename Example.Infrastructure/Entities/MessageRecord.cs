@@ -1,8 +1,10 @@
-﻿namespace Example.Infrastructure.Entities
+﻿using System;
+
+namespace Example.Infrastructure.Entities
 {
     public class MessageRecord
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string Text { get; set; }
     }
 }

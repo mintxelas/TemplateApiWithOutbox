@@ -1,28 +1,35 @@
-﻿using Example.Domain;
+﻿using System;
+using Example.Domain;
 using Example.Infrastructure.SqLite;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace Example.Infrastructure.Tests
 {
     public class MessageRepositoryShould
     {
-        private const int ANotPersistedId = 123456;
         private const string SomeText = "Some Text";
-        private const int AnExistingMessageId = 0;
         private const string AChangedText = "changed text";
+        private static readonly Guid ANotPersistedId = Guid.NewGuid();
+        private static readonly Guid AnExistingMessageId = Guid.NewGuid();
         private readonly MessageSqLiteRepository repository;
+        private readonly ExampleDbContext exampleDbContext;
 
         public MessageRepositoryShould()
         {
-            repository = new MessageSqLiteRepository(new ExampleDbContext());
+            var options = new DbContextOptionsBuilder<ExampleDbContext>().UseInMemoryDatabase(this.GetType().Name).Options;
+            exampleDbContext = new ExampleDbContext(options);
+            repository = new MessageSqLiteRepository(exampleDbContext);
         }
 
         [Fact]
         public async Task retrieve_a_message_by_its_id()
         {
-            var expectedMessage = GivenPersistedMessage();
+            var expectedMessage = await GivenPersistedMessage();
             var actualMessage = await repository.GetById(expectedMessage.Id);
             Assert.Equal(expectedMessage.Id, actualMessage.Id);
         }
@@ -46,15 +53,17 @@ namespace Example.Infrastructure.Tests
         }
 
         [Fact]
-        public async Task publish_events_to_bus_when_saving_changes()
+        public async Task save_events_in_outbox_when_saving_changes()
         {
-            var givenMessage = GivenPersistedMessage();
+            var givenMessage = await GivenPersistedMessage();
             givenMessage.Process(SomeText);
 
             await repository.Save(givenMessage);
-            
-            //bus.Received().Publish(Arg.Is<MatchingMessageReceived>(e =>
-            //    e.MessageId == AnExistingMessageId));
+
+            var outboxEvent = exampleDbContext.OutboxEvent.Single(oe =>
+                oe.EventName == typeof(MatchingMessageReceived).AssemblyQualifiedName);
+            var actualEvent = (MatchingMessageReceived)JsonSerializer.Deserialize(outboxEvent.Payload, Type.GetType(outboxEvent.EventName));
+            Assert.Equal(givenMessage.Id, actualEvent.MessageId);
         }
 
         private Message GivenUpdatedMessage()
@@ -62,10 +71,11 @@ namespace Example.Infrastructure.Tests
             return new Message(AnExistingMessageId, AChangedText);
         }
 
-        private Message GivenPersistedMessage()
+        private async Task<Message> GivenPersistedMessage()
         {
-            // I know this message is in the sample repo. 
-            return new Message(AnExistingMessageId, SomeText);
+            var message = new Message(AnExistingMessageId, SomeText);
+            await repository.Save(message);
+            return message;
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Example.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<MessageDto>> Get([FromRoute] int id)
+        public async Task<ActionResult<MessageDto>> Get([FromRoute] Guid id)
         {
             var message = await repository.GetById(id);
             if (message is null)
@@ -37,14 +37,14 @@ namespace Example.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromForm] string text)
         {
-            var id = await messageService.Create(text);
-            logger.LogInformation("Processed Post for messageId={id} with text={text}", id, text);
+            await messageService.Create(text);
+            logger.LogInformation("Created message with text={text}", text);
             return Ok();
         }
 
         [MapToApiVersion("1.0")]
         [HttpPut("process/{id}")]
-        public async Task<IActionResult> PutV1([FromRoute] int id)
+        public async Task<IActionResult> PutV1([FromRoute] Guid id)
         {
             await messageService.Process(id, "Hello");
             logger.LogInformation("Processed PutV1 for messageId={id}", id);
@@ -53,7 +53,7 @@ namespace Example.Api.Controllers
 
         [MapToApiVersion("2.0")]
         [HttpPut("process/{id}")]
-        public async Task<IActionResult> PutV2([FromRoute] int id)
+        public async Task<IActionResult> PutV2([FromRoute] Guid id)
         {
             await messageService.Process(id, "World");
             logger.LogInformation("Processed PutV2 for messageId={id}", id);
