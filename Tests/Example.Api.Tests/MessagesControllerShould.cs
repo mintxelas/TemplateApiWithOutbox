@@ -56,7 +56,7 @@ namespace Example.Api.Tests
             var response = await client.PostAsync($"/messages/{SomeId}", null);
 
             response.EnsureSuccessStatusCode();
-            factory.MessageProcessingService.Received().Process(SomeId, matchingWord);  
+            await factory.MessageProcessingService.Received().Process(SomeId, matchingWord);  
         }   
     }
 }

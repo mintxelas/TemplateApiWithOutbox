@@ -1,6 +1,8 @@
 using Example.Application;
 using Example.Domain;
 using Example.Infrastructure;
+using Example.Infrastructure.Entities;
+using Example.Infrastructure.SqLite;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -8,7 +10,6 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace Example.Api
 {
@@ -46,42 +47,29 @@ namespace Example.Api
                 options.SwaggerDoc("v2", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Example API", Version = "v2" });
             });
 
-
-            if (configuration["UseOutbox"] == "true")
-            {
-                services.AddScoped<ExampleDbContext>();
-                services.AddScoped<IOutboxRepository, OutboxSqLiteRepository>();
-                services.AddSingleton<IEventReader>(
-                    serviceProvider => new BusReaderWithOutbox(
-                        serviceProvider.GetRequiredService<ILogger<BusReaderWithOutbox>>(),
-                        new OutboxSqLiteRepository(new ExampleDbContext())));
-                services.AddScoped<IEventWriter>(
-                    serviceProvider => serviceProvider.GetRequiredService<IOutboxRepository>());
-            }
-            else
-            {
-                services.AddSingleton<InMemoryBus>();
-                services.AddSingleton<IEventWriter>(
-                    serviceProvider => serviceProvider.GetRequiredService<InMemoryBus>());
-                services.AddSingleton<IEventReader>(
-                    serviceProvider => serviceProvider.GetRequiredService<InMemoryBus>());
-            }
-
+            services.AddDbContext<ExampleDbContext>();
+            services.AddDbContext<OutboxConsumerDbContext>(ServiceLifetime.Singleton);
+            services.AddSingleton<OutboxSqLiteRepository>();
+            services.AddSingleton<IEventReader, BusSubscriptionsWithOutbox>();
+            
             services.AddTransient<NotificationsContextSubscriptions>();
             services.AddTransient<MonitoringContextSubscriptions>();
 
             services.AddScoped<MessageProcessingService>();
-            services.AddScoped<IMessageRepository, MessageRepository>();
+            services.AddScoped<IMessageRepository, MessageSqLiteRepository>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider,
-            NotificationsContextSubscriptions notificationsContext, MonitoringContextSubscriptions monitoringContext)
+            NotificationsContextSubscriptions notificationsContext, MonitoringContextSubscriptions monitoringContext,
+            ExampleDbContext dbContext)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
+            dbContext.Database.EnsureCreated();
+            
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {

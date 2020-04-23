@@ -1,29 +1,36 @@
-﻿using Example.Domain;
-using Example.Infrastructure.Entities;
+﻿using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Example.Domain;
+using Example.Infrastructure.Entities;
 
-namespace Example.Infrastructure
+namespace Example.Infrastructure.SqLite
 {
     public class MessageSqLiteRepository : IMessageRepository
     {
-        private readonly IEventWriter bus;
         private readonly ExampleDbContext dbContext;
 
-        public MessageSqLiteRepository(IEventWriter bus, ExampleDbContext dbContext) 
-            => (this.bus, this.dbContext) = (bus, dbContext);
+        public MessageSqLiteRepository(ExampleDbContext dbContext) 
+            => this.dbContext = dbContext;
 
         public Task<Message> GetById(int id)
-            => Task.FromResult(ToMessage(dbContext.Messages
+            => Task.FromResult(ToMessage(dbContext.MessageRecord
                     .SingleOrDefault(m => m.Id == id)));
 
         public Task Save(Message message)
         {
             dbContext.Add(ToRecord(message));
             var withEvents = (IExposeEvents)message;
-            foreach (var @event in withEvents.PendingEvents)
+            foreach (var domainEvent in withEvents.PendingEvents)
             {
-                bus.Publish(@event);
+                var outboxEvent = new OutboxEvent
+                {
+                    CreatedDate = DateTimeOffset.Now,
+                    EventName = domainEvent.GetType().AssemblyQualifiedName,
+                    Payload = JsonSerializer.Serialize(domainEvent)
+                };
+                dbContext.Add(outboxEvent);
             }
             withEvents.ClearPendingEvents();
             return dbContext.SaveChangesAsync();

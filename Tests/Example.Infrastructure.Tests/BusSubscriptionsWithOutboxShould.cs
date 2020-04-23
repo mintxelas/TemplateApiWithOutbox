@@ -1,4 +1,5 @@
 using Example.Domain;
+using Example.Infrastructure.SqLite;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
@@ -7,17 +8,15 @@ using Xunit;
 
 namespace Example.Infrastructure.Tests
 {
-    public class InMemoryBusWithOutboxShould
+    public class BusSubscriptionsWithOutboxShould
     {
-        private readonly ILogger<BusReaderWithOutbox> logger;
-        private readonly OutboxInMemoryRepository busWriter;
-        private readonly BusReaderWithOutbox busReader;
+        private readonly BusSubscriptionsWithOutbox busReader;
 
-        public InMemoryBusWithOutboxShould()
+        public BusSubscriptionsWithOutboxShould()
         {
-            logger = Substitute.For<ILogger<BusReaderWithOutbox>>();
-            busWriter = new OutboxInMemoryRepository();
-            busReader = new BusReaderWithOutbox(logger, busWriter);
+            var logger = Substitute.For<ILogger<BusSubscriptionsWithOutbox>>();
+            var busWriter = new OutboxSqLiteRepository(new OutboxConsumerDbContext());
+            busReader = new BusSubscriptionsWithOutbox(logger, busWriter);
         }
 
         [Fact]
@@ -25,10 +24,9 @@ namespace Example.Infrastructure.Tests
         {
             var invoked = false;
             var domainEvent = new MockEvent();
-            Action<MockEvent> handler = (evt) => invoked = true;
-            busReader.Subscribe(handler);
+            void Handler(MockEvent evt) => invoked = true;
+            busReader.Subscribe((Action<MockEvent>) Handler);
 
-            busWriter.Publish(domainEvent);
             Thread.Sleep(6 * 1000);
 
             Assert.True(invoked);
@@ -39,11 +37,9 @@ namespace Example.Infrastructure.Tests
         {
             var invokedTimes = 0;
             var domainEvent = new MockEvent();
-            Action<MockEvent> handler = (evt) => invokedTimes += 1;
-            busReader.Subscribe(handler);
+            void Handler(MockEvent evt) => invokedTimes += 1;
+            busReader.Subscribe((Action<MockEvent>)Handler);
 
-            busWriter.Publish(domainEvent);
-            busWriter.Publish(domainEvent);
             Thread.Sleep(6 * 1000);
 
             Assert.Equal(2, invokedTimes);

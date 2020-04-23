@@ -4,18 +4,18 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace Example.Infrastructure
+namespace Example.Infrastructure.SqLite
 {
-    public sealed class BusReaderWithOutbox : IEventReader
+    public sealed class BusSubscriptionsWithOutbox : IEventReader
     {
-        private static readonly ConcurrentDictionary<Type, List<Action<DomainEvent>>> subscribers 
+        private static readonly ConcurrentDictionary<Type, List<Action<DomainEvent>>> Subscribers 
             = new ConcurrentDictionary<Type, List<Action<DomainEvent>>>();
 
         private readonly System.Threading.Timer timer;
-        private readonly ILogger<BusReaderWithOutbox> logger;
-        private readonly IOutboxRepository repository;
+        private readonly ILogger<BusSubscriptionsWithOutbox> logger;
+        private readonly OutboxSqLiteRepository repository;
 
-        public BusReaderWithOutbox(ILogger<BusReaderWithOutbox> logger, IOutboxRepository repository)
+        public BusSubscriptionsWithOutbox(ILogger<BusSubscriptionsWithOutbox> logger, OutboxSqLiteRepository repository)
         {
             this.logger = logger;
             this.repository = repository;
@@ -27,7 +27,7 @@ namespace Example.Infrastructure
             var key = typeof(T);
             var wrapper = new Action<DomainEvent>(evt => handler((T)evt));
 
-            subscribers.AddOrUpdate(key,
+            Subscribers.AddOrUpdate(key,
                     new List<Action<DomainEvent>> { wrapper },
                     (type, handlers) =>
                     {
@@ -47,9 +47,9 @@ namespace Example.Infrastructure
         private void Send(DomainEvent domainEvent)
         {
             var key = domainEvent.GetType();
-            if (subscribers.ContainsKey(key))
+            if (Subscribers.ContainsKey(key))
             {
-                foreach (var handler in subscribers[key])
+                foreach (var handler in Subscribers[key])
                 {
                     try
                     {
@@ -65,7 +65,7 @@ namespace Example.Infrastructure
 
         public void Dispose()
         {
-            subscribers?.Clear();
+            Subscribers?.Clear();
             timer?.Dispose();
         }
     }

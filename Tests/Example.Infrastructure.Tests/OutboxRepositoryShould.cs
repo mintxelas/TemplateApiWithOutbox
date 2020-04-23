@@ -1,4 +1,5 @@
 ﻿using Example.Domain;
+using Example.Infrastructure.SqLite;
 using System.Linq;
 using Xunit;
 
@@ -6,20 +7,17 @@ namespace Example.Infrastructure.Tests
 {
     public class OutboxRepositoryShould
     {
-        private readonly OutboxInMemoryRepository repository;
+        private readonly OutboxSqLiteRepository repository;
 
         public OutboxRepositoryShould()
-        {
-            repository = new OutboxInMemoryRepository();
+        {   
+            repository = new OutboxSqLiteRepository(new OutboxConsumerDbContext());
         }
 
         [Fact]
         public void retrieve_the_stored_event()
         {
             var givenEvent = new MockEvent();
-
-            repository.Publish(givenEvent);
-
             var actualEvents = repository.PendingEvents();
             Assert.Single(actualEvents.Where(e => e == givenEvent));
         }
@@ -29,9 +27,7 @@ namespace Example.Infrastructure.Tests
         {
             var givenEvent1 = new MockEvent();
             var givenEvent2 = new MockEvent();
-            repository.Publish(givenEvent1);
-            repository.Publish(givenEvent2);
-
+            
             var actualEvents = repository.PendingEvents().ToArray();
 
             Assert.Contains(givenEvent1, actualEvents);
@@ -43,10 +39,8 @@ namespace Example.Infrastructure.Tests
         public void not_return_an_event_after_it_has_been_already_returned()
         {
             var givenEvent1 = new MockEvent();
-            var givenEvent2 = new MockEvent();
-            repository.Publish(givenEvent1);
             _ = repository.PendingEvents().ToArray();
-            repository.Publish(givenEvent2);
+            var givenEvent2 = new MockEvent();
 
             var actualEvents = repository.PendingEvents().ToArray();
 

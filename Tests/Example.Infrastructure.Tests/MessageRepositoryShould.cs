@@ -1,6 +1,5 @@
 ﻿using Example.Domain;
-using NSubstitute;
-using System;
+using Example.Infrastructure.SqLite;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
@@ -13,13 +12,11 @@ namespace Example.Infrastructure.Tests
         private const string SomeText = "Some Text";
         private const int AnExistingMessageId = 0;
         private const string AChangedText = "changed text";
-        private readonly MessageRepository repository;
-        private readonly IEventWriter bus;
+        private readonly MessageSqLiteRepository repository;
 
         public MessageRepositoryShould()
         {
-            bus = Substitute.For<IEventWriter>();
-            repository = new MessageRepository(bus);
+            repository = new MessageSqLiteRepository(new ExampleDbContext());
         }
 
         [Fact]
@@ -33,8 +30,8 @@ namespace Example.Infrastructure.Tests
         [Fact]
         public void throw_key_not_found_exception_when_message_is_not_in_database()
         {
-            Action getAction = () => _ = repository.GetById(ANotPersistedId).Result;
-            Assert.Throws<KeyNotFoundException>(getAction);
+            void GetAction() => _ = repository.GetById(ANotPersistedId).Result;
+            Assert.Throws<KeyNotFoundException>(GetAction);
         }
 
         [Fact]
@@ -56,8 +53,8 @@ namespace Example.Infrastructure.Tests
 
             await repository.Save(givenMessage);
             
-            bus.Received().Publish(Arg.Is<MatchingMessageReceived>(e =>
-                e.MessageId == AnExistingMessageId));
+            //bus.Received().Publish(Arg.Is<MatchingMessageReceived>(e =>
+            //    e.MessageId == AnExistingMessageId));
         }
 
         private Message GivenUpdatedMessage()
