@@ -19,7 +19,7 @@ namespace Example.Infrastructure.SqLite
         {
             this.logger = logger;
             this.repository = repository;
-            timer = new System.Threading.Timer(OnTick, null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(5));
+            timer = new System.Threading.Timer(OnTick, null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(5));
         }
 
         public void Subscribe<T>(Action<T> handler) where T : DomainEvent
@@ -40,11 +40,11 @@ namespace Example.Infrastructure.SqLite
         {
             foreach (var @event in repository.PendingEvents())
             {
-                Send(@event);
+                Publish(@event);
             }
         }
 
-        private void Send(DomainEvent domainEvent)
+        private void Publish(DomainEvent domainEvent)
         {
             var key = domainEvent.GetType();
             if (Subscribers.ContainsKey(key))

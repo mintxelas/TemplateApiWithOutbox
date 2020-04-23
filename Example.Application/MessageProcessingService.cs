@@ -1,4 +1,5 @@
-﻿using Example.Domain;
+﻿using System.Dynamic;
+using Example.Domain;
 using System.Threading.Tasks;
 
 namespace Example.Application
@@ -12,11 +13,18 @@ namespace Example.Application
             this.repository = repository;
         }
 
+        public virtual Task<int> Create(string text)
+        {
+            var message = new Message(text);
+            return repository.Save(message);
+        }
+
         public virtual async Task Process(int messageId, string messageToMatch)
         {
             var message = await repository.GetById(messageId);
+            if (message is null) return;
             message.Process(messageToMatch);
-            await repository.Save(message);            
+            _ = await repository.Save(message);            
         }
     }
 }

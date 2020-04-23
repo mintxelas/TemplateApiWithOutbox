@@ -68,8 +68,9 @@ namespace Example.Api
                 app.UseDeveloperExceptionPage();
             }
 
+            dbContext.Database.EnsureDeleted();
             dbContext.Database.EnsureCreated();
-            
+
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {

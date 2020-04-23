@@ -18,9 +18,18 @@ namespace Example.Infrastructure.SqLite
             => Task.FromResult(ToMessage(dbContext.MessageRecord
                     .SingleOrDefault(m => m.Id == id)));
 
-        public Task Save(Message message)
+        public async Task<int> Save(Message message)
         {
-            dbContext.Add(ToRecord(message));
+            var record = ToRecord(message);
+            if (message.Id < 0)
+            {
+                await dbContext.MessageRecord.AddAsync(record);
+            }
+            else
+            {
+                dbContext.MessageRecord.Update(record);
+            }
+
             var withEvents = (IExposeEvents)message;
             foreach (var domainEvent in withEvents.PendingEvents)
             {
@@ -30,10 +39,13 @@ namespace Example.Infrastructure.SqLite
                     EventName = domainEvent.GetType().AssemblyQualifiedName,
                     Payload = JsonSerializer.Serialize(domainEvent)
                 };
-                dbContext.Add(outboxEvent);
+                dbContext.OutboxEvent.Add(outboxEvent);
             }
             withEvents.ClearPendingEvents();
-            return dbContext.SaveChangesAsync();
+
+            await dbContext.SaveChangesAsync();
+
+            return record.Id;
         }
 
         private Message ToMessage(MessageRecord record)
@@ -44,7 +56,6 @@ namespace Example.Infrastructure.SqLite
         private MessageRecord ToRecord(Message message)
             => new MessageRecord
                {
-                   Id = message.Id,
                    Text = message.Text
                };
     }

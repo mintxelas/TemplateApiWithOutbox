@@ -10,14 +10,17 @@ namespace Example.Domain
 
         public string Text { get; }
         
-        public Message(int id, string message)
-            => (Id, Text) = (id, message);
+        public Message(int id, string text)
+            => (Id, Text) = (id, text);
+
+        public Message(string text)
+            => (Id, Text) = (default, text);
 
         public virtual void Process(string testToMatch)
         {
             if (Text == testToMatch)
             {
-                pendingEvents.Add(new MatchingMessageReceived(Id));
+                pendingEvents.Add(new MatchingMessageReceived { MessageId = Id });
             }
         }
 

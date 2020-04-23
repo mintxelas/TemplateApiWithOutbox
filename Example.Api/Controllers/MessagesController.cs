@@ -29,24 +29,34 @@ namespace Example.Api.Controllers
         public async Task<ActionResult<MessageDto>> Get([FromRoute] int id)
         {
             var message = await repository.GetById(id);
+            if (message is null)
+                return NotFound();
             return Ok(ToDto(message));
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Post([FromForm] string text)
+        {
+            var id = await messageService.Create(text);
+            logger.LogInformation("Processed Post for messageId={id} with text={text}", id, text);
+            return Ok();
+        }
+
         [MapToApiVersion("1.0")]
-        [HttpPost("{id}")]
-        public async Task<IActionResult> Post([FromRoute] int id)
+        [HttpPut("process/{id}")]
+        public async Task<IActionResult> PutV1([FromRoute] int id)
         {
             await messageService.Process(id, "Hello");
-            logger.LogInformation("Processed PostV1 for messageId={id}", id);
+            logger.LogInformation("Processed PutV1 for messageId={id}", id);
             return Ok();
         }
 
         [MapToApiVersion("2.0")]
-        [HttpPost("{id}")]
-        public async Task<IActionResult> PostV2([FromRoute] int id)
+        [HttpPut("process/{id}")]
+        public async Task<IActionResult> PutV2([FromRoute] int id)
         {
             await messageService.Process(id, "World");
-            logger.LogInformation("Processed PostV2 for messageId={id}", id);
+            logger.LogInformation("Processed PutV2 for messageId={id}", id);
             return Ok();
         }
 

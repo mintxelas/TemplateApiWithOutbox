@@ -18,12 +18,14 @@ namespace Example.Infrastructure.SqLite
 
         public IEnumerable<DomainEvent> PendingEvents()
         {
-            foreach(var outboxEvent in dbContext.OutboxEvent.Where(oe => !oe.ProcessedDate.HasValue))
+            foreach(var outboxEvent in dbContext.OutboxEvent
+                .Where(oe => !oe.ProcessedDate.HasValue)
+                .OrderBy(oe => oe.Id))
             {
                 outboxEvent.ProcessedDate = DateTimeOffset.Now;
+                dbContext.SaveChanges();
                 yield return ToDomainEvent(outboxEvent);
             }
-            dbContext.SaveChanges();
         }
 
         private DomainEvent ToDomainEvent(OutboxEvent outboxEvent)

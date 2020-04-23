@@ -3,19 +3,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Example.Infrastructure.SqLite
 {
-    public class ExampleDbContext: DbContext
+    public class OutboxConsumerDbContext : DbContext
     {
-        public DbSet<MessageRecord> MessageRecord { get; set; }
         public DbSet<OutboxEvent> OutboxEvent { get; set; }
 
-        public ExampleDbContext()
+        public OutboxConsumerDbContext()
         {
             
         }
 
-        public ExampleDbContext(DbContextOptions<ExampleDbContext> options) : base(options)
+        public OutboxConsumerDbContext(DbContextOptions<OutboxConsumerDbContext> options) : base(options)
         {
-                
+            
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -26,8 +25,7 @@ namespace Example.Infrastructure.SqLite
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<MessageRecord>().ToTable("MessageRecord").HasKey(m => m.Id);
-            modelBuilder.Entity<OutboxEvent>().ToTable("OutboxEvent").HasKey(oe => oe.Id);
+            modelBuilder.Entity<OutboxEvent>().ToTable("OutboxEvent").HasKey(oe => oe.Id); 
         }
     }
 }
