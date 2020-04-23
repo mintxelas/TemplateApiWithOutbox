@@ -11,15 +11,16 @@ namespace Example.Infrastructure.SqLite
         private static readonly ConcurrentDictionary<Type, List<Action<DomainEvent>>> Subscribers 
             = new ConcurrentDictionary<Type, List<Action<DomainEvent>>>();
 
-        private readonly System.Threading.Timer timer;
         private readonly ILogger<BusSubscriptionsWithOutbox> logger;
         private readonly OutboxSqLiteRepository repository;
+        private readonly RepeatingTimer timer;
 
-        public BusSubscriptionsWithOutbox(ILogger<BusSubscriptionsWithOutbox> logger, OutboxSqLiteRepository repository)
+        public BusSubscriptionsWithOutbox(ILogger<BusSubscriptionsWithOutbox> logger, OutboxSqLiteRepository repository, RepeatingTimer timer)
         {
             this.logger = logger;
             this.repository = repository;
-            timer = new System.Threading.Timer(OnTick, null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(5));
+            this.timer = timer;
+            this.timer.OnTick = OnTick;
         }
 
         public void Subscribe<T>(Action<T> handler) where T : DomainEvent
@@ -36,7 +37,7 @@ namespace Example.Infrastructure.SqLite
                     });
         }
 
-        private void OnTick(object state)
+        private void OnTick()
         {
             foreach (var @event in repository.PendingEvents())
             {
