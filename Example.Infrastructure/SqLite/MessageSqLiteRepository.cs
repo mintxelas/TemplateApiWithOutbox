@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Example.Domain;
+using Example.Infrastructure.Entities;
+using System;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Example.Domain;
-using Example.Infrastructure.Entities;
 
 namespace Example.Infrastructure.SqLite
 {
@@ -20,30 +20,40 @@ namespace Example.Infrastructure.SqLite
 
         public async Task Save(Message message)
         {
-            var record = ToRecord(message);
+            await AddOrUpdateMessage(message);
+            await AddOutboxEvents(message);
+            await dbContext.SaveChangesAsync();
+        }
+
+        private async Task AddOrUpdateMessage(Message message)
+        {
             if (message.Id == default)
             {
-                await dbContext.MessageRecord.AddAsync(record);
+                await dbContext.MessageRecord.AddAsync(ToRecord(message));
             }
             else
             {
+                var record = dbContext.MessageRecord.Single(m => m.Id == message.Id);
+                record.Text = message.Text;
                 dbContext.MessageRecord.Update(record);
             }
+        }
 
-            var withEvents = (IExposeEvents)message;
+        private async Task AddOutboxEvents(Message message)
+        {
+            var withEvents = (IExposeEvents) message;
             foreach (var domainEvent in withEvents.PendingEvents)
             {
                 var outboxEvent = new OutboxEvent
                 {
                     CreatedDate = DateTimeOffset.Now,
                     EventName = domainEvent.GetType().AssemblyQualifiedName,
-                    Payload = JsonSerializer.Serialize(domainEvent)
+                    Payload = JsonSerializer.Serialize(domainEvent, domainEvent.GetType())
                 };
-                dbContext.OutboxEvent.Add(outboxEvent);
+                await dbContext.OutboxEvent.AddAsync(outboxEvent);
             }
-            withEvents.ClearPendingEvents();
 
-            await dbContext.SaveChangesAsync();
+            withEvents.ClearPendingEvents();
         }
 
         private Message ToMessage(MessageRecord record)

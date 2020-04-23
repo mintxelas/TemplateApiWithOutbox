@@ -1,33 +1,41 @@
-﻿using Example.Domain;
+﻿using System;
+using Example.Domain;
 using Example.Infrastructure.SqLite;
 using System.Linq;
+using System.Text.Json;
+using Example.Infrastructure.Entities;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace Example.Infrastructure.Tests
 {
-    public class OutboxRepositoryShould
+    public sealed class OutboxRepositoryShould: IDisposable
     {
         private readonly OutboxSqLiteRepository repository;
+        private readonly OutboxConsumerDbContext dbContext;
 
         public OutboxRepositoryShould()
-        {   
-            repository = new OutboxSqLiteRepository(new OutboxConsumerDbContext());
+        {
+            var options = new DbContextOptionsBuilder<OutboxConsumerDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+            dbContext = new OutboxConsumerDbContext(options);
+            repository = new OutboxSqLiteRepository(dbContext);
         }
 
         [Fact]
         public void retrieve_the_stored_event()
         {
-            var givenEvent = new MockEvent();
+            var givenEvent = GivenEvent();
             var actualEvents = repository.PendingEvents();
-            Assert.Single(actualEvents.Where(e => e == givenEvent));
+            Assert.Single(actualEvents.Where(e => e.Equals(givenEvent)));
         }
 
         [Fact]
         public void store_multiple_events_at_once()
         {
-            var givenEvent1 = new MockEvent();
-            var givenEvent2 = new MockEvent();
+            var givenEvent1 = GivenEvent();
+            var givenEvent2 = GivenEvent();
             
+
             var actualEvents = repository.PendingEvents().ToArray();
 
             Assert.Contains(givenEvent1, actualEvents);
@@ -38,9 +46,9 @@ namespace Example.Infrastructure.Tests
         [Fact]
         public void not_return_an_event_after_it_has_been_already_returned()
         {
-            var givenEvent1 = new MockEvent();
+            var givenEvent1 = GivenEvent();
             _ = repository.PendingEvents().ToArray();
-            var givenEvent2 = new MockEvent();
+            var givenEvent2 = GivenEvent();
 
             var actualEvents = repository.PendingEvents().ToArray();
 
@@ -48,7 +56,36 @@ namespace Example.Infrastructure.Tests
             Assert.Contains(givenEvent2, actualEvents);
             Assert.Single(actualEvents);
         }
+        
+        private MockEvent GivenEvent()
+        {
+            var givenEvent = new MockEvent(){ Id = Guid.NewGuid() };
+            dbContext.OutboxEvent.Add(new OutboxEvent()
+            {
+                CreatedDate = DateTimeOffset.Now,
+                EventName = givenEvent.GetType().AssemblyQualifiedName,
+                Payload = JsonSerializer.Serialize(givenEvent)
+            });
+            dbContext.SaveChanges();
+            return givenEvent;
+        }
 
-        private class MockEvent:DomainEvent { }
+        public void Dispose()
+        {
+            dbContext?.Dispose();
+        }
+
+        private class MockEvent : DomainEvent
+        {
+            public Guid Id { get; set; }
+
+            public override bool Equals(object obj)
+            {
+                if (obj is null) return false;
+                if (obj is MockEvent other)
+                    return other.Id == Id;
+                return false;
+            }
+        }
     }
 }

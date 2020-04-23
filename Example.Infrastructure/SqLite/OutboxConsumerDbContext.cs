@@ -19,8 +19,8 @@ namespace Example.Infrastructure.SqLite
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(@"Data Source=MessagesDB.db")
-                .UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
+            if (!optionsBuilder.IsConfigured)
+                optionsBuilder.UseSqlite(@"Data Source=MessagesDB.db");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

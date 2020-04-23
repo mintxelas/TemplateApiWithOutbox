@@ -1,27 +1,26 @@
-﻿using System;
-using Example.Domain;
+﻿using Example.Domain;
+using Example.Infrastructure.Entities;
 using Example.Infrastructure.SqLite;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace Example.Infrastructure.Tests
 {
-    public class MessageRepositoryShould
+    public sealed class MessageRepositoryShould : IDisposable
     {
         private const string SomeText = "Some Text";
         private const string AChangedText = "changed text";
-        private static readonly Guid ANotPersistedId = Guid.NewGuid();
-        private static readonly Guid AnExistingMessageId = Guid.NewGuid();
+        private static readonly Guid APersistedId = Guid.NewGuid();
         private readonly MessageSqLiteRepository repository;
         private readonly ExampleDbContext exampleDbContext;
 
         public MessageRepositoryShould()
         {
-            var options = new DbContextOptionsBuilder<ExampleDbContext>().UseInMemoryDatabase(this.GetType().Name).Options;
+            var options = new DbContextOptionsBuilder<ExampleDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
             exampleDbContext = new ExampleDbContext(options);
             repository = new MessageSqLiteRepository(exampleDbContext);
         }
@@ -35,21 +34,14 @@ namespace Example.Infrastructure.Tests
         }
 
         [Fact]
-        public void throw_key_not_found_exception_when_message_is_not_in_database()
-        {
-            void GetAction() => _ = repository.GetById(ANotPersistedId).Result;
-            Assert.Throws<KeyNotFoundException>(GetAction);
-        }
-
-        [Fact]
         public async Task store_a_message()
         {
-            var expectedMessage = GivenUpdatedMessage();
+            var expectedMessage = GivenNewMessage();
 
             await repository.Save(expectedMessage);
 
-            var actualMessage = await repository.GetById(expectedMessage.Id);
-            Assert.Equal(expectedMessage.Id, actualMessage.Id);
+            var actualMessage = exampleDbContext.MessageRecord.Single();
+            Assert.Equal(expectedMessage.Text, actualMessage.Text);
         }
 
         [Fact]
@@ -66,16 +58,26 @@ namespace Example.Infrastructure.Tests
             Assert.Equal(givenMessage.Id, actualEvent.MessageId);
         }
 
-        private Message GivenUpdatedMessage()
+        private Message GivenNewMessage()
         {
-            return new Message(AnExistingMessageId, AChangedText);
+            return new Message(default, AChangedText);
         }
 
         private async Task<Message> GivenPersistedMessage()
         {
-            var message = new Message(AnExistingMessageId, SomeText);
-            await repository.Save(message);
-            return message;
+            var messageRecord = new MessageRecord()
+            {
+                Id = APersistedId,
+                Text = SomeText
+            };
+            await exampleDbContext.MessageRecord.AddAsync(messageRecord);
+            await exampleDbContext.SaveChangesAsync();
+            return new Message(APersistedId, SomeText);
+        }
+
+        public void Dispose()
+        {
+            exampleDbContext?.Dispose();
         }
     }
 }

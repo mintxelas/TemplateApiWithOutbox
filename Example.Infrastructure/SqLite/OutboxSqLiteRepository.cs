@@ -16,7 +16,7 @@ namespace Example.Infrastructure.SqLite
             this.dbContext = dbContext;
         }
 
-        public IEnumerable<DomainEvent> PendingEvents()
+        public virtual IEnumerable<DomainEvent> PendingEvents()
         {
             foreach(var outboxEvent in dbContext.OutboxEvent
                 .Where(oe => !oe.ProcessedDate.HasValue)
