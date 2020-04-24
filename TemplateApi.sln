@@ -7,21 +7,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{277C2805-E40
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{80D4C521-B605-4224-9A3B-E35FAF9D4568}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Api", "src\Example.Api\Template.Api.csproj", "{03211AC8-38B7-46CF-8503-AEB65B457321}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Api", "src\Api\Template.Api.csproj", "{03211AC8-38B7-46CF-8503-AEB65B457321}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Application", "src\Example.Application\Template.Application.csproj", "{A3B99CF9-491B-4F82-89D6-272E41C7571B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Application", "src\Application\Template.Application.csproj", "{A3B99CF9-491B-4F82-89D6-272E41C7571B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Domain", "src\Example.Domain\Template.Domain.csproj", "{7F6D4354-C38A-4439-B61B-75A5265BB0E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Domain", "src\Domain\Template.Domain.csproj", "{7F6D4354-C38A-4439-B61B-75A5265BB0E0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Infrastructure", "src\Example.Infrastructure\Template.Infrastructure.csproj", "{DAC64EFF-AA74-44E1-AEBA-A0876B3E6585}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Infrastructure", "src\Infrastructure\Template.Infrastructure.csproj", "{DAC64EFF-AA74-44E1-AEBA-A0876B3E6585}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Api.Tests", "tests\Example.Api.Tests\Template.Api.Tests.csproj", "{4C005BCA-AB4B-4329-BCF1-EDC000BF960D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Api.Tests", "tests\Api\Template.Api.Tests.csproj", "{4C005BCA-AB4B-4329-BCF1-EDC000BF960D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Application.Tests", "tests\Example.Application.Tests\Template.Application.Tests.csproj", "{9B04B027-E42E-41D8-94B8-539586E8CD7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Application.Tests", "tests\Application\Template.Application.Tests.csproj", "{9B04B027-E42E-41D8-94B8-539586E8CD7E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Domain.Tests", "tests\Example.Domain.Tests\Template.Domain.Tests.csproj", "{51396C1A-F917-4681-895A-7C71A8B67B83}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Domain.Tests", "tests\Domain\Template.Domain.Tests.csproj", "{51396C1A-F917-4681-895A-7C71A8B67B83}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Infrastructure.Tests", "tests\Example.Infrastructure.Tests\Template.Infrastructure.Tests.csproj", "{3AF87002-98B4-4DF4-8604-ACA4CC18FFF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Infrastructure.Tests", "tests\Infrastructure\Template.Infrastructure.Tests.csproj", "{3AF87002-98B4-4DF4-8604-ACA4CC18FFF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

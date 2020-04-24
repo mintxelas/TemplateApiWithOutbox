@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Example.Application\Template.Application.csproj" />
-    <ProjectReference Include="..\Example.Infrastructure\Template.Infrastructure.csproj" />
+    <ProjectReference Include="..\Application\Template.Application.csproj" />
+    <ProjectReference Include="..\Infrastructure\Template.Infrastructure.csproj" />
   </ItemGroup>
 
 
