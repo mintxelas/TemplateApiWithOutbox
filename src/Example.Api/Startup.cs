@@ -1,8 +1,3 @@
-using Example.Application;
-using Example.Domain;
-using Example.Infrastructure;
-using Example.Infrastructure.Entities;
-using Example.Infrastructure.SqLite;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -10,8 +5,12 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Template.Application;
+using Template.Domain;
+using Template.Infrastructure;
+using Template.Infrastructure.SqLite;
 
-namespace Example.Api
+namespace Template.Api
 {
     public class Startup
     {

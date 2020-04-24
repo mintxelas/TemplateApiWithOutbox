@@ -1,11 +1,11 @@
-﻿using Example.Domain;
-using Example.Infrastructure.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using Template.Domain;
+using Template.Infrastructure.Entities;
 
-namespace Example.Infrastructure.SqLite
+namespace Template.Infrastructure.SqLite
 {
     public class OutboxSqLiteRepository 
     {

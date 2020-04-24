@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Example.Domain
+namespace Template.Domain
 {
     public class Message: IExposeEvents
     {

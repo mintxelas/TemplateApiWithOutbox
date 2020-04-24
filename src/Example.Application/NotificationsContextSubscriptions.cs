@@ -1,8 +1,8 @@
-﻿using Example.Domain;
+﻿using System;
 using Microsoft.Extensions.Logging;
-using System;
+using Template.Domain;
 
-namespace Example.Application
+namespace Template.Application
 {
     public class NotificationsContextSubscriptions
     {

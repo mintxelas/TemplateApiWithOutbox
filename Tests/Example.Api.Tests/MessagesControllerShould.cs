@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using Example.Api.Models;
-using Example.Application;
-using Example.Domain;
-using NSubstitute;
 using System.Text.Json;
 using System.Threading.Tasks;
+using NSubstitute;
+using Template.Api.Models;
+using Template.Application;
+using Template.Domain;
 using Xunit;
 
-namespace Example.Api.Tests
+namespace Template.Api.Tests
 {
     public class MessagesControllerShould : IClassFixture<CustomWebApplicationFactory<Startup>>
     {

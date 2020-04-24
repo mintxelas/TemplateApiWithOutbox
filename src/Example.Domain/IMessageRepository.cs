@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Example.Domain
+namespace Template.Domain
 {
     public interface IMessageRepository
     {

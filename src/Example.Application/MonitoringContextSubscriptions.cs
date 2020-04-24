@@ -1,7 +1,7 @@
-﻿using Example.Domain;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Template.Domain;
 
-namespace Example.Application
+namespace Template.Application
 {
     public class MonitoringContextSubscriptions
     {

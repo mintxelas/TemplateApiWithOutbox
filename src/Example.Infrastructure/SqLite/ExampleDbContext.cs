@@ -1,7 +1,7 @@
-﻿using Example.Infrastructure.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Template.Infrastructure.Entities;
 
-namespace Example.Infrastructure.SqLite
+namespace Template.Infrastructure.SqLite
 {
     public class ExampleDbContext: DbContext
     {

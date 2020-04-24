@@ -1,14 +1,14 @@
-﻿using Example.Domain;
-using Example.Infrastructure.Entities;
-using Example.Infrastructure.SqLite;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Template.Domain;
+using Template.Infrastructure.Entities;
+using Template.Infrastructure.SqLite;
 using Xunit;
 
-namespace Example.Infrastructure.Tests
+namespace Template.Infrastructure.Tests
 {
     public sealed class MessageRepositoryShould : IDisposable
     {

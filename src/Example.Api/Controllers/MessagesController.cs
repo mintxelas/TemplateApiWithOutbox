@@ -1,12 +1,12 @@
-﻿using Example.Api.Models;
-using Example.Application;
-using Example.Domain;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
+using Template.Api.Models;
+using Template.Application;
+using Template.Domain;
 
-namespace Example.Api.Controllers
+namespace Template.Api.Controllers
 {
     [ApiVersion("1.0")]
     [ApiVersion("2.0")]

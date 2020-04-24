@@ -1,4 +1,4 @@
-﻿namespace Example.Domain
+﻿namespace Template.Domain
 {
     public interface DomainEvent
     {

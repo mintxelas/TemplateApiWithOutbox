@@ -1,9 +1,8 @@
 using System;
-using Example.Domain;
 using System.Linq;
 using Xunit;
 
-namespace Example.Domain.Tests
+namespace Template.Domain.Tests
 {
     public class MessageShould
     {

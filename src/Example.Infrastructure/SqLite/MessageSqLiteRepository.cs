@@ -1,11 +1,11 @@
-﻿using Example.Domain;
-using Example.Infrastructure.Entities;
-using System;
+﻿using System;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Template.Domain;
+using Template.Infrastructure.Entities;
 
-namespace Example.Infrastructure.SqLite
+namespace Template.Infrastructure.SqLite
 {
     public class MessageSqLiteRepository : IMessageRepository
     {

@@ -1,8 +1,8 @@
-﻿using Example.Domain;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Template.Domain;
 
-namespace Example.Application
+namespace Template.Application
 {
     public class MessageProcessingService
     {

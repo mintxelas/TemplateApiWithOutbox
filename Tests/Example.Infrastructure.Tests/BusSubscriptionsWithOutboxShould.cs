@@ -1,11 +1,11 @@
-using Example.Domain;
-using Example.Infrastructure.SqLite;
+using System;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using System;
+using Template.Domain;
+using Template.Infrastructure.SqLite;
 using Xunit;
 
-namespace Example.Infrastructure.Tests
+namespace Template.Infrastructure.Tests
 {
     public class BusSubscriptionsWithOutboxShould
     {

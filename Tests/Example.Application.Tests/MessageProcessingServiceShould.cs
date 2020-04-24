@@ -1,10 +1,10 @@
 using System;
 using System.Threading.Tasks;
-using Example.Domain;
 using NSubstitute;
+using Template.Domain;
 using Xunit;
 
-namespace Example.Application.Tests
+namespace Template.Application.Tests
 {
     public class MessageProcessingServiceShould
     {

@@ -1,13 +1,13 @@
-﻿using Example.Application;
-using Example.Domain;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
-using Example.Infrastructure.SqLite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Template.Application;
+using Template.Domain;
+using Template.Infrastructure.SqLite;
 
-namespace Example.Api.Tests
+namespace Template.Api.Tests
 {
     public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
     {

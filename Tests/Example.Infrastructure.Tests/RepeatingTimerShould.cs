@@ -2,7 +2,7 @@
 using System.Threading;
 using Xunit;
 
-namespace Example.Infrastructure.Tests
+namespace Template.Infrastructure.Tests
 {
     public class RepeatingTimerShould
     {

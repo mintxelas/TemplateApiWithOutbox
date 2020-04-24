@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Example.Infrastructure.Entities
+namespace Template.Infrastructure.Entities
 {
     public class OutboxEvent
     {

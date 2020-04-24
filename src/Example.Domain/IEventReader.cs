@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Example.Domain
+namespace Template.Domain
 {
     public interface IEventReader : IDisposable
     {

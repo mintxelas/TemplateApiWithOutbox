@@ -1,10 +1,10 @@
-﻿using Example.Domain;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
+using Template.Domain;
 
-namespace Example.Infrastructure.SqLite
+namespace Template.Infrastructure.SqLite
 {
     public sealed class BusSubscriptionsWithOutbox : IEventReader
     {
