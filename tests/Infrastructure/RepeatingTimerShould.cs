@@ -26,7 +26,7 @@ namespace Template.Infrastructure.Tests
         }
 
         [Fact]
-        public void invoke_handler_every_period_passes()
+        public void invoke_handler_every_period_passes_Starting_immediately()
         {
             var invokedTime = new Stopwatch();
             invokedTime.Start();
@@ -41,7 +41,7 @@ namespace Template.Infrastructure.Tests
 
             timer.Dispose();
             invokedTime.Stop();
-            Assert.True(invokedTime.ElapsedMilliseconds >= 30);
+            Assert.True(invokedTime.ElapsedMilliseconds >= 20);
         }
     }
 }

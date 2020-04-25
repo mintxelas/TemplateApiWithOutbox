@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 using Template.Infrastructure.Entities;
 
 namespace Template.Infrastructure.SqLite
 {
-    public class ExampleDbContext: DbContext
+    public class ExampleDbContext: DbContext, IOutboxDbContext
     {
         public DbSet<MessageRecord> MessageRecord { get; set; }
         public DbSet<OutboxEvent> OutboxEvent { get; set; }
@@ -28,6 +29,11 @@ namespace Template.Infrastructure.SqLite
         {
             modelBuilder.Entity<MessageRecord>().ToTable("MessageRecord").HasKey(m => m.Id);
             modelBuilder.Entity<OutboxEvent>().ToTable("OutboxEvent").HasKey(oe => oe.Id);
+        }
+
+        public Task<int> SaveChangesAsync()
+        {
+            return base.SaveChangesAsync();
         }
     }
 }

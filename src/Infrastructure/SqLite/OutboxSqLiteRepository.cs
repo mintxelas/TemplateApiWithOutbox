@@ -7,11 +7,11 @@ using Template.Infrastructure.Entities;
 
 namespace Template.Infrastructure.SqLite
 {
-    public class OutboxSqLiteRepository 
+    public class OutboxSqLiteRepository : IOutboxRepository
     {
-        private readonly OutboxConsumerDbContext dbContext;
+        private readonly IOutboxDbContext dbContext;
 
-        public OutboxSqLiteRepository(OutboxConsumerDbContext dbContext)
+        public OutboxSqLiteRepository(IOutboxDbContext dbContext)
         {
             this.dbContext = dbContext;
         }

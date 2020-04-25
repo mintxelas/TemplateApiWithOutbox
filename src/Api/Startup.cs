@@ -47,8 +47,8 @@ namespace Template.Api
             });
 
             services.AddDbContext<ExampleDbContext>();
-            services.AddDbContext<OutboxConsumerDbContext>(ServiceLifetime.Singleton);
-            services.AddSingleton<OutboxSqLiteRepository>();
+            services.AddDbContext<IOutboxDbContext, OutboxConsumerDbContext>(ServiceLifetime.Singleton);
+            services.AddSingleton<IOutboxRepository, OutboxSqLiteRepository>();
             services.AddSingleton(_ => new RepeatingTimer(10 * 1000, 1 * 1000));
             services.AddSingleton<IEventReader, BusSubscriptionsWithOutbox>();
             

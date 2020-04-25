@@ -12,10 +12,10 @@ namespace Template.Infrastructure.SqLite
             = new ConcurrentDictionary<Type, List<Action<DomainEvent>>>();
 
         private readonly ILogger<BusSubscriptionsWithOutbox> logger;
-        private readonly OutboxSqLiteRepository repository;
+        private readonly IOutboxRepository repository;
         private readonly RepeatingTimer timer;
 
-        public BusSubscriptionsWithOutbox(ILogger<BusSubscriptionsWithOutbox> logger, OutboxSqLiteRepository repository, RepeatingTimer timer)
+        public BusSubscriptionsWithOutbox(ILogger<BusSubscriptionsWithOutbox> logger, IOutboxRepository repository, RepeatingTimer timer)
         {
             this.logger = logger;
             this.repository = repository;
