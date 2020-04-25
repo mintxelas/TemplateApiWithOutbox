@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices.ComTypes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -45,7 +46,7 @@ namespace Template.Api
                 options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Example API", Version = "v1" });
                 options.SwaggerDoc("v2", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Example API", Version = "v2" });
             });
-
+            
             services.AddDbContext<ExampleDbContext>();
             services.AddDbContext<IOutboxDbContext, OutboxConsumerDbContext>(ServiceLifetime.Singleton);
             services.AddSingleton<IOutboxRepository, OutboxSqLiteRepository>();
@@ -57,6 +58,12 @@ namespace Template.Api
 
             services.AddScoped<MessageProcessingService>();
             services.AddScoped<IMessageRepository, MessageSqLiteRepository>();
+
+
+            services.AddHealthChecks()
+                .AddDbContextCheck<ExampleDbContext>();
+
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider,
@@ -85,6 +92,7 @@ namespace Template.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
             });
 
             notificationsContext.InitializeSubscriptions();
