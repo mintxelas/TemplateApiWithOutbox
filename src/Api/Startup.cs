@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Template.Api.HealthChecks;
 using Template.Application;
 using Template.Domain;
 using Template.Infrastructure;
@@ -92,7 +93,7 @@ namespace Template.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHealthChecks("/health");
+                endpoints.MapHealthCheckWithVersion("/health");
             });
 
             notificationsContext.InitializeSubscriptions();
