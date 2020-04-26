@@ -47,6 +47,10 @@ namespace Template.Api.Tests
         [Fact]
         public async Task create_a_message_on_post()
         {
+            factory.MessageProcessingService
+                .Create(SomeText)
+                .Returns(new Message(SomeId, SomeText));
+
             var requestContent = new FormUrlEncodedContent(new [] {
                 new KeyValuePair<string, string>("text", SomeText)
             });

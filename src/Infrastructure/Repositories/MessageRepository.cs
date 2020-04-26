@@ -23,7 +23,7 @@ namespace Template.Infrastructure.Repositories
         public async Task<Message> Save(Message message)
         {
             var savedMessage = await AddOrUpdateMessage(message);
-            await AddOutboxEvents(savedMessage);
+            await AddOutboxEvents(message);
             await dbContext.SaveChangesAsync();
             return savedMessage;
         }

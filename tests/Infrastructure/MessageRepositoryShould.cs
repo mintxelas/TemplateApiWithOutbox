@@ -51,7 +51,7 @@ namespace Template.Infrastructure.Tests
             var givenMessage = await GivenPersistedMessage();
             givenMessage.Process(SomeText);
 
-            await repository.Save(givenMessage);
+            var actualMessage = await repository.Save(givenMessage);
 
             var outboxEvent = exampleDbContext.OutboxEvents.Single(oe =>
                 oe.EventName == typeof(MatchingMessageReceived).AssemblyQualifiedName);
@@ -71,7 +71,7 @@ namespace Template.Infrastructure.Tests
                 Id = APersistedId,
                 Text = SomeText
             };
-            await exampleDbContext.MessageRecords.AddAsync(messageRecord);
+            _ = await exampleDbContext.MessageRecords.AddAsync(messageRecord);
             await exampleDbContext.SaveChangesAsync();
             return new Message(APersistedId, SomeText);
         }
