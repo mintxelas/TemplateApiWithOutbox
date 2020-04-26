@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Template.Application;
+using Template.Application.Application;
+using Template.Application.CreateMessage;
 using Template.Domain;
 using Template.Infrastructure;
 using Template.Infrastructure.EntityFramework;
@@ -78,6 +82,18 @@ namespace Template.Api
                 optionsBuilder.UseSqlite(connectionString);
             });
             services.AddScoped<IMessageRepository, MessageRepository>();
+            return services;
+        }
+
+        public static IServiceCollection AddMediatorWithBehaviors(this IServiceCollection services)
+        {
+            services.AddMediatR(typeof(CreateMessageResponse).Assembly);
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidatorPipelineBehavior<,>));
+            services.Scan(scan => scan
+                .FromAssemblyOf<CreateMessageValidator>()
+                .AddClasses(@class => @class.AssignableTo(typeof(IValidator<>)))
+                .AsImplementedInterfaces());
             return services;
         }
     }

@@ -1,10 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Template.Api.Models;
-using Template.Application;
+using Template.Application.CreateMessage;
+using Template.Application.ProcessMessage;
 using Template.Domain;
 
 namespace Template.Api.Controllers
@@ -16,13 +18,13 @@ namespace Template.Api.Controllers
     public class MessagesController : ControllerBase
     {
         private readonly IMessageRepository repository;
-        private readonly MessageProcessingService messageService;
+        private readonly IMediator mediator;
         private readonly ILogger<MessagesController> logger;
 
-        public MessagesController(IMessageRepository repository, MessageProcessingService messageService, ILogger<MessagesController> logger)
+        public MessagesController(IMessageRepository repository, IMediator mediator, ILogger<MessagesController> logger)
         {
             this.repository = repository;
-            this.messageService = messageService;
+            this.mediator = mediator;
             this.logger = logger;
         }
 
@@ -47,26 +49,40 @@ namespace Template.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Guid>> Post([FromForm] string text)
         {
-            var message = await messageService.Create(text);
-            logger.LogInformation("Created message with id={id} and text={text}", message.Id, message.Text);
-            return Ok(ToDto(message));
+            var request = new CreateMessageRequest(text);
+            var response = await mediator.Send(request);
+            if (response is CreateMessageSuccessResponse success)
+            {
+                logger.LogInformation("Created message with id={id} and text={text}", success.Message.Id, success.Message.Text);
+                return Ok(success.Message.Id);
+            }
+
+            return BadRequest(response.Description);
         }
 
         [MapToApiVersion("1.0")]
         [HttpPut("process/{id}")]
-        public async Task<IActionResult> PutV1([FromRoute] Guid id)
-        {
-            await messageService.Process(id, "Hello");
-            logger.LogInformation("Processed PutV1 for messageId={id}", id);
-            return Ok();
-        }
+        public Task<IActionResult> PutV1([FromRoute] Guid id) => Put(id, "Hello");
 
         [MapToApiVersion("2.0")]
         [HttpPut("process/{id}")]
-        public async Task<IActionResult> PutV2([FromRoute] Guid id)
+        public Task<IActionResult> PutV2([FromRoute] Guid id) => Put(id, "World");
+
+        private async Task<IActionResult> Put(Guid id, string textToMatch)
         {
-            await messageService.Process(id, "World");
-            logger.LogInformation("Processed PutV2 for messageId={id}", id);
+            var request = new ProcessMessageRequest(id, textToMatch);
+            var response = await mediator.Send(request);
+            if (response is MessageToProcessNotFoundResponse)
+            {
+                return NotFound();
+            }
+
+            if (response is ErrorProcessingMessageResponse error)
+            {
+                return BadRequest(error.Description);
+            }
+
+            logger.LogInformation("Processed PutV1 for messageId={id}", id);
             return Ok();
         }
 
