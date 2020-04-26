@@ -18,7 +18,7 @@ namespace Template.Infrastructure.SqLite
 
         public virtual IEnumerable<DomainEvent> PendingEvents()
         {
-            foreach(var outboxEvent in dbContext.OutboxEvent
+            foreach(var outboxEvent in dbContext.OutboxEvents
                 .Where(oe => !oe.ProcessedDate.HasValue)
                 .OrderBy(oe => oe.Id))
             {

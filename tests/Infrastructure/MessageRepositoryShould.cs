@@ -40,7 +40,7 @@ namespace Template.Infrastructure.Tests
 
             await repository.Save(expectedMessage);
 
-            var actualMessage = exampleDbContext.MessageRecord.Single();
+            var actualMessage = exampleDbContext.MessageRecords.Single();
             Assert.Equal(expectedMessage.Text, actualMessage.Text);
         }
 
@@ -52,7 +52,7 @@ namespace Template.Infrastructure.Tests
 
             await repository.Save(givenMessage);
 
-            var outboxEvent = exampleDbContext.OutboxEvent.Single(oe =>
+            var outboxEvent = exampleDbContext.OutboxEvents.Single(oe =>
                 oe.EventName == typeof(MatchingMessageReceived).AssemblyQualifiedName);
             var actualEvent = (MatchingMessageReceived)JsonSerializer.Deserialize(outboxEvent.Payload, Type.GetType(outboxEvent.EventName));
             Assert.Equal(givenMessage.Id, actualEvent.MessageId);
@@ -70,7 +70,7 @@ namespace Template.Infrastructure.Tests
                 Id = APersistedId,
                 Text = SomeText
             };
-            await exampleDbContext.MessageRecord.AddAsync(messageRecord);
+            await exampleDbContext.MessageRecords.AddAsync(messageRecord);
             await exampleDbContext.SaveChangesAsync();
             return new Message(APersistedId, SomeText);
         }

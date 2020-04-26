@@ -21,13 +21,13 @@ namespace Template.Api.HealthChecks
                         {
                             status = report.Status.ToString(),
                             assemblyVersion = assemblyVersionString,
-                            duration = report.TotalDuration.TotalMilliseconds,
+                            duration = $"{report.TotalDuration.TotalMilliseconds} ms",
                             info = report.Entries.Select(e => new
                             {
-                                e.Key,
-                                e.Value.Description,
-                                Status = e.Value.Status.ToString(),
-                                Error = e.Value.Exception?.Message
+                                name = e.Key,
+                                description = e.Value.Description,
+                                status = e.Value.Status.ToString(),
+                                error = e.Value.Exception?.Message
                             }).ToArray()
                         },
                         new JsonSerializerOptions

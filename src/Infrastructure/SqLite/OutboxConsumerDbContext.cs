@@ -6,7 +6,7 @@ namespace Template.Infrastructure.SqLite
 {
     public class OutboxConsumerDbContext : DbContext, IOutboxDbContext
     {
-        public DbSet<OutboxEvent> OutboxEvent { get; set; }
+        public DbSet<OutboxEvent> OutboxEvents { get; set; }
 
         public OutboxConsumerDbContext()
         {
@@ -15,7 +15,7 @@ namespace Template.Infrastructure.SqLite
 
         public OutboxConsumerDbContext(DbContextOptions<OutboxConsumerDbContext> options) : base(options)
         {
-            
+
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -26,7 +26,7 @@ namespace Template.Infrastructure.SqLite
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<OutboxEvent>().ToTable("OutboxEvent").HasKey(oe => oe.Id); 
+            modelBuilder.Entity<OutboxEvent>().ToTable("OutboxEvents").HasKey(oe => oe.Id); 
         }
 
         public Task<int> SaveChangesAsync()

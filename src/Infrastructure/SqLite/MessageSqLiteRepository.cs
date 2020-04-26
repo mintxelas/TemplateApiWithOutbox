@@ -15,7 +15,7 @@ namespace Template.Infrastructure.SqLite
             => this.dbContext = dbContext;
 
         public Task<Message> GetById(Guid id)
-            => Task.FromResult(ToMessage(dbContext.MessageRecord
+            => Task.FromResult(ToMessage(dbContext.MessageRecords
                     .SingleOrDefault(m => m.Id == id)));
 
         public async Task Save(Message message)
@@ -29,13 +29,13 @@ namespace Template.Infrastructure.SqLite
         {
             if (message.Id == default)
             {
-                await dbContext.MessageRecord.AddAsync(ToRecord(message));
+                await dbContext.MessageRecords.AddAsync(ToRecord(message));
             }
             else
             {
-                var record = dbContext.MessageRecord.Single(m => m.Id == message.Id);
+                var record = dbContext.MessageRecords.Single(m => m.Id == message.Id);
                 record.Text = message.Text;
-                dbContext.MessageRecord.Update(record);
+                dbContext.MessageRecords.Update(record);
             }
         }
 
@@ -50,7 +50,7 @@ namespace Template.Infrastructure.SqLite
                     EventName = domainEvent.GetType().AssemblyQualifiedName,
                     Payload = JsonSerializer.Serialize(domainEvent, domainEvent.GetType())
                 };
-                await dbContext.OutboxEvent.AddAsync(outboxEvent);
+                await dbContext.OutboxEvents.AddAsync(outboxEvent);
             }
 
             withEvents.ClearPendingEvents();

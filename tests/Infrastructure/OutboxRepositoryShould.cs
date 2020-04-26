@@ -60,7 +60,7 @@ namespace Template.Infrastructure.Tests
         private MockEvent GivenEvent()
         {
             var givenEvent = new MockEvent(){ Id = Guid.NewGuid() };
-            dbContext.OutboxEvent.Add(new OutboxEvent()
+            dbContext.OutboxEvents.Add(new OutboxEvent()
             {
                 CreatedDate = DateTimeOffset.Now,
                 EventName = givenEvent.GetType().AssemblyQualifiedName,

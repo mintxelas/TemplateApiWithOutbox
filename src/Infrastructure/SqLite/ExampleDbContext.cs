@@ -1,13 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 using Template.Infrastructure.Entities;
 
 namespace Template.Infrastructure.SqLite
 {
     public class ExampleDbContext: DbContext
     {
-        public DbSet<MessageRecord> MessageRecord { get; set; }
-        public DbSet<OutboxEvent> OutboxEvent { get; set; }
+        public DbSet<MessageRecord> MessageRecords { get; set; }
+        public DbSet<OutboxEvent> OutboxEvents { get; set; }
 
         public ExampleDbContext()
         {
@@ -27,8 +26,8 @@ namespace Template.Infrastructure.SqLite
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<MessageRecord>().ToTable("MessageRecord").HasKey(m => m.Id);
-            modelBuilder.Entity<OutboxEvent>().ToTable("OutboxEvent").HasKey(oe => oe.Id);
+            modelBuilder.Entity<MessageRecord>().ToTable("MessageRecords").HasKey(m => m.Id);
+            modelBuilder.Entity<OutboxEvent>().ToTable("OutboxEvents").HasKey(oe => oe.Id);
         }
     }
 }

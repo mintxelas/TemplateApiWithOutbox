@@ -6,7 +6,7 @@ namespace Template.Infrastructure
 {
     public interface IOutboxDbContext
     {
-        DbSet<OutboxEvent> OutboxEvent { get; set; }
+        DbSet<OutboxEvent> OutboxEvents { get; set; }
         int SaveChanges();
         Task<int> SaveChangesAsync();
     }

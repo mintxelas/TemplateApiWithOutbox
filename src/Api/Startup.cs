@@ -1,15 +1,11 @@
-using System.Runtime.InteropServices.ComTypes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Template.Api.HealthChecks;
 using Template.Application;
-using Template.Domain;
-using Template.Infrastructure;
 using Template.Infrastructure.SqLite;
 
 namespace Template.Api
@@ -26,68 +22,28 @@ namespace Template.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-
-            services.AddApiVersioning(options =>
-            {
-                options.ReportApiVersions = true;
-                options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
-                options.AssumeDefaultVersionWhenUnspecified = true;
-                options.ApiVersionReader = ApiVersionReader.Combine(
-                    new HeaderApiVersionReader("X-version"),
-                    new QueryStringApiVersionReader("api-version"));
-            });
-
-            services.AddVersionedApiExplorer(options =>
-            {
-                options.GroupNameFormat = "'v'VVV";
-            });
-
-            services.AddSwaggerGen(options =>
-            {
-                options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Example API", Version = "v1" });
-                options.SwaggerDoc("v2", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Example API", Version = "v2" });
-            });
-            
-            services.AddDbContext<ExampleDbContext>();
-            services.AddDbContext<IOutboxDbContext, OutboxConsumerDbContext>(ServiceLifetime.Singleton);
-            services.AddSingleton<IOutboxRepository, OutboxSqLiteRepository>();
-            services.AddSingleton(_ => new RepeatingTimer(10 * 1000, 1 * 1000));
-            services.AddSingleton<IEventReader, BusSubscriptionsWithOutbox>();
-            
-            services.AddTransient<NotificationsContextSubscriptions>();
-            services.AddTransient<MonitoringContextSubscriptions>();
-
+            services.AddVersionedApi();
+            services.AddSwaggerWithVersions("Template Api", 1, 2);
+            services.AddOutboxSupport<OutboxConsumerDbContext, OutboxSqLiteRepository>(
+                connectionString: @"Data Source=MessagesDB.db",
+                outboxReadDueSeconds: 10, 
+                outboxReadPeriodSeconds: 10);
+            services.AddSubscriptions();
             services.AddScoped<MessageProcessingService>();
-            services.AddScoped<IMessageRepository, MessageSqLiteRepository>();
-
-
             services.AddHealthChecks()
                 .AddDbContextCheck<ExampleDbContext>();
-
-
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider,
-            NotificationsContextSubscriptions notificationsContext, MonitoringContextSubscriptions monitoringContext,
-            ExampleDbContext dbContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ExampleDbContext dbContext)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                dbContext.Database.EnsureDeleted();
+                dbContext.Database.EnsureCreated();
             }
 
-            dbContext.Database.EnsureDeleted();
-            dbContext.Database.EnsureCreated();
-
-            app.UseSwagger();
-            app.UseSwaggerUI(options =>
-            {
-                foreach (var description in provider.ApiVersionDescriptions)
-                {
-                    options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
-                }
-            });
-
+            app.UseSwaggerWithVersions();
             app.UseRouting();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
@@ -96,8 +52,7 @@ namespace Template.Api
                 endpoints.MapHealthCheckWithVersion("/health");
             });
 
-            notificationsContext.InitializeSubscriptions();
-            monitoringContext.InitializeSubscriptions();
+            app.UseSubscriptions();
         }
     }
 }
