@@ -48,7 +48,7 @@ namespace Template.Api.Controllers
         public async Task<ActionResult<Guid>> Post([FromForm] string text)
         {
             var message = await messageService.Create(text);
-            logger.LogInformation("Created message with text={text}", text);
+            logger.LogInformation("Created message with id={id} and text={text}", message.Id, message.Text);
             return Ok(ToDto(message));
         }
 
