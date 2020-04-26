@@ -6,6 +6,6 @@ namespace Template.Domain
     public interface IMessageRepository
     {
         Task<Message> GetById(Guid id);
-        Task Save(Message message);
+        Task<Message> Save(Message message);
     }
 }

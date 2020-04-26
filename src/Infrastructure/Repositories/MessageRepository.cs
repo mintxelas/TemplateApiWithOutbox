@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Template.Domain;
 using Template.Infrastructure.Entities;
 using Template.Infrastructure.EntityFramework;
@@ -12,37 +13,41 @@ namespace Template.Infrastructure.Repositories
     {
         private readonly ExampleDbContext dbContext;
 
-        public MessageRepository(ExampleDbContext dbContext) 
+        public MessageRepository(ExampleDbContext dbContext)
             => this.dbContext = dbContext;
 
         public Task<Message> GetById(Guid id)
             => Task.FromResult(ToMessage(dbContext.MessageRecords
                     .SingleOrDefault(m => m.Id == id)));
 
-        public async Task Save(Message message)
+        public async Task<Message> Save(Message message)
         {
-            await AddOrUpdateMessage(message);
-            await AddOutboxEvents(message);
+            var savedMessage = await AddOrUpdateMessage(message);
+            await AddOutboxEvents(savedMessage);
             await dbContext.SaveChangesAsync();
+            return savedMessage;
         }
 
-        private async Task AddOrUpdateMessage(Message message)
+        private async Task<Message> AddOrUpdateMessage(Message message)
         {
+            EntityEntry<MessageRecord> savedEntity;
             if (message.Id == default)
             {
-                await dbContext.MessageRecords.AddAsync(ToRecord(message));
+                savedEntity = await dbContext.MessageRecords.AddAsync(ToRecord(message));
             }
             else
             {
                 var record = dbContext.MessageRecords.Single(m => m.Id == message.Id);
                 record.Text = message.Text;
-                dbContext.MessageRecords.Update(record);
+                savedEntity = dbContext.MessageRecords.Update(record);
             }
+
+            return ToMessage(savedEntity.Entity);
         }
 
         private async Task AddOutboxEvents(Message message)
         {
-            var withEvents = (IExposeEvents) message;
+            var withEvents = (IExposeEvents)message;
             foreach (var domainEvent in withEvents.PendingEvents)
             {
                 var outboxEvent = new OutboxEvent
@@ -64,9 +69,9 @@ namespace Template.Infrastructure.Repositories
 
         private MessageRecord ToRecord(Message message)
             => new MessageRecord
-               {
-                   Id = message.Id == default ? Guid.NewGuid() : message.Id,
-                   Text = message.Text
-               };
+            {
+                Id = message.Id == default ? Guid.NewGuid() : message.Id,
+                Text = message.Text
+            };
     }
 }

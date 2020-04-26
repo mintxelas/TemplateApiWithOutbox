@@ -13,7 +13,7 @@ namespace Template.Application
             this.repository = repository;
         }
 
-        public virtual Task Create(string text)
+        public virtual Task<Message> Create(string text)
         {
             var message = new Message(text);
             return repository.Save(message);

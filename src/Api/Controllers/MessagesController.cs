@@ -35,11 +35,11 @@ namespace Template.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromForm] string text)
+        public async Task<ActionResult<Guid>> Post([FromForm] string text)
         {
-            await messageService.Create(text);
+            var message = await messageService.Create(text);
             logger.LogInformation("Created message with text={text}", text);
-            return Ok();
+            return Ok(ToDto(message));
         }
 
         [MapToApiVersion("1.0")]
