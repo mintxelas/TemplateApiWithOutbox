@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Template.Domain;
 using Template.Infrastructure.Entities;
 using Template.Infrastructure.EntityFramework;
@@ -33,19 +33,19 @@ namespace Template.Infrastructure.Repositories
 
         private async Task<Message> AddOrUpdateMessage(Message message)
         {
-            EntityEntry<MessageRecord> savedEntity;
+            EntityEntry<MessageRecord> entityEntry;
             if (message.Id == default)
             {
-                savedEntity = await dbContext.MessageRecords.AddAsync(ToRecord(message));
+                entityEntry = await dbContext.MessageRecords.AddAsync(ToRecord(message));
             }
             else
             {
                 var record = dbContext.MessageRecords.Single(m => m.Id == message.Id);
                 record.Text = message.Text;
-                savedEntity = dbContext.MessageRecords.Update(record);
+                entityEntry = dbContext.MessageRecords.Update(record);
             }
 
-            return ToMessage(savedEntity.Entity);
+            return ToMessage(entityEntry.Entity);
         }
 
         private async Task AddOutboxEvents(Message message)
