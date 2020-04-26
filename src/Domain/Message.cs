@@ -30,5 +30,12 @@ namespace Template.Domain
 
         IEnumerable<DomainEvent> IExposeEvents.PendingEvents 
             => pendingEvents.ToArray();
+
+        public override bool Equals(object obj)
+        {
+            if (obj is null) return false;
+            if (obj is Message other) return Id == other.Id && Text == other.Text;
+            return false;
+        }
     }
 }

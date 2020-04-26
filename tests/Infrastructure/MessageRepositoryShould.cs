@@ -27,6 +27,14 @@ namespace Template.Infrastructure.Tests
         }
 
         [Fact]
+        public async Task retrieve_all_messages()
+        {
+            var expectedMessage = await GivenPersistedMessage();
+            var actualMessages = await repository.GetAll();
+            Assert.Contains(expectedMessage, actualMessages);
+        }
+
+        [Fact]
         public async Task retrieve_a_message_by_its_id()
         {
             var expectedMessage = await GivenPersistedMessage();

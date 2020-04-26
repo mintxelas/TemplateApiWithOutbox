@@ -1,9 +1,10 @@
+using NSubstitute;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using NSubstitute;
 using Template.Api.Models;
 using Template.Application;
 using Template.Domain;
@@ -26,6 +27,22 @@ namespace Template.Api.Tests
             var mockService = Substitute.For<MessageProcessingService>(new object[] { null });
             factory.MessageProcessingService = mockService;
             client = this.factory.CreateClient();
+        }
+
+        [Fact]
+        public async Task return_all_repository_messages_on_get()
+        {
+            var expectedMessage = new Message(SomeId, SomeText);
+            factory.MessageRepository
+                .GetAll()
+                .Returns(new [] {expectedMessage});
+
+            var response = await client.GetAsync("/messages");
+
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            var actualMessages = JsonSerializer.Deserialize<MessageDto[]>(responseString);
+            Assert.Contains(expectedMessage.Id, actualMessages.Select(m => m.id));
         }
 
         [Fact]

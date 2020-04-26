@@ -16,6 +16,9 @@ namespace Template.Infrastructure.Repositories
         public MessageRepository(ExampleDbContext dbContext)
             => this.dbContext = dbContext;
 
+        public Task<Message[]> GetAll()
+            => Task.FromResult(dbContext.MessageRecords.Select(ToMessage).ToArray());
+
         public Task<Message> GetById(Guid id)
             => Task.FromResult(ToMessage(dbContext.MessageRecords
                     .SingleOrDefault(m => m.Id == id)));

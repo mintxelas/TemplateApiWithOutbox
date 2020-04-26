@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -23,6 +24,15 @@ namespace Template.Api.Controllers
             this.repository = repository;
             this.messageService = messageService;
             this.logger = logger;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<MessageDto>> GetAll()
+        {
+            var messages = await repository.GetAll();
+            if (messages is null)
+                return NotFound();
+            return Ok(messages.Select(ToDto));
         }
 
         [HttpGet("{id}")]
