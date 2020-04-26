@@ -1,27 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Template.Infrastructure.Entities;
 
-namespace Template.Infrastructure.SqLite
+namespace Template.Infrastructure.EntityFramework
 {
     public class OutboxConsumerDbContext : DbContext, IOutboxDbContext
     {
         public DbSet<OutboxEvent> OutboxEvents { get; set; }
 
-        public OutboxConsumerDbContext()
-        {
-            
-        }
-
         public OutboxConsumerDbContext(DbContextOptions<OutboxConsumerDbContext> options) : base(options)
         {
 
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-                optionsBuilder.UseSqlite(@"Data Source=MessagesDB.db");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

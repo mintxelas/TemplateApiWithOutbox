@@ -6,7 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Template.Api.HealthChecks;
 using Template.Application;
-using Template.Infrastructure.SqLite;
+using Template.Infrastructure.EntityFramework;
+using Template.Infrastructure.Repositories;
 
 namespace Template.Api
 {
@@ -22,12 +23,13 @@ namespace Template.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddVersionedApi();
+            services.AddVersionedApi(defaultApiVersion: 1);
             services.AddSwaggerWithVersions("Template Api", 1, 2);
-            services.AddOutboxSupport<OutboxConsumerDbContext, OutboxSqLiteRepository>(
+            services.AddOutboxSupport<OutboxConsumerDbContext, OutboxRepository>(
                 connectionString: @"Data Source=MessagesDB.db",
                 outboxReadDueSeconds: 10, 
                 outboxReadPeriodSeconds: 10);
+            services.AddExampleRepository(@"Data Source=MessagesDB.db");
             services.AddSubscriptions();
             services.AddScoped<MessageProcessingService>();
             services.AddHealthChecks()

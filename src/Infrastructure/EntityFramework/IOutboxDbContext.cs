@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Template.Infrastructure.Entities;
 
-namespace Template.Infrastructure
+namespace Template.Infrastructure.EntityFramework
 {
     public interface IOutboxDbContext
     {

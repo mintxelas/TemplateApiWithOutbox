@@ -4,14 +4,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Template.Domain;
 using Template.Infrastructure.Entities;
+using Template.Infrastructure.EntityFramework;
 
-namespace Template.Infrastructure.SqLite
+namespace Template.Infrastructure.Repositories
 {
-    public class MessageSqLiteRepository : IMessageRepository
+    public class MessageRepository : IMessageRepository
     {
         private readonly ExampleDbContext dbContext;
 
-        public MessageSqLiteRepository(ExampleDbContext dbContext) 
+        public MessageRepository(ExampleDbContext dbContext) 
             => this.dbContext = dbContext;
 
         public Task<Message> GetById(Guid id)

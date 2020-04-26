@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Threading;
+using Template.Infrastructure.Subscriptions;
 using Xunit;
 
 namespace Template.Infrastructure.Tests

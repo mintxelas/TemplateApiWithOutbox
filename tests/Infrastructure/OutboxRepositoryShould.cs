@@ -4,21 +4,22 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Template.Domain;
 using Template.Infrastructure.Entities;
-using Template.Infrastructure.SqLite;
+using Template.Infrastructure.EntityFramework;
+using Template.Infrastructure.Repositories;
 using Xunit;
 
 namespace Template.Infrastructure.Tests
 {
     public sealed class OutboxRepositoryShould: IDisposable
     {
-        private readonly OutboxSqLiteRepository repository;
+        private readonly OutboxRepository repository;
         private readonly OutboxConsumerDbContext dbContext;
 
         public OutboxRepositoryShould()
         {
             var options = new DbContextOptionsBuilder<OutboxConsumerDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
             dbContext = new OutboxConsumerDbContext(options);
-            repository = new OutboxSqLiteRepository(dbContext);
+            repository = new OutboxRepository(dbContext);
         }
 
         [Fact]

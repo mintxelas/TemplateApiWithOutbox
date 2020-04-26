@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Template.Application;
 using Template.Domain;
 using Template.Infrastructure;
-using Template.Infrastructure.SqLite;
+using Template.Infrastructure.EntityFramework;
 
 namespace Template.Api.Tests
 {

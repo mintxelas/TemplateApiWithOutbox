@@ -4,14 +4,15 @@ using System.Linq;
 using System.Text.Json;
 using Template.Domain;
 using Template.Infrastructure.Entities;
+using Template.Infrastructure.EntityFramework;
 
-namespace Template.Infrastructure.SqLite
+namespace Template.Infrastructure.Repositories
 {
-    public class OutboxSqLiteRepository : IOutboxRepository
+    public class OutboxRepository : IOutboxRepository
     {
         private readonly IOutboxDbContext dbContext;
 
-        public OutboxSqLiteRepository(IOutboxDbContext dbContext)
+        public OutboxRepository(IOutboxDbContext dbContext)
         {
             this.dbContext = dbContext;
         }

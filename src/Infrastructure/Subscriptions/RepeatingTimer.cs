@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Template.Infrastructure
+namespace Template.Infrastructure.Subscriptions
 {
     public sealed class RepeatingTimer: IDisposable
     {

@@ -8,7 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Template.Application;
 using Template.Domain;
 using Template.Infrastructure;
-using Template.Infrastructure.SqLite;
+using Template.Infrastructure.EntityFramework;
+using Template.Infrastructure.Repositories;
+using Template.Infrastructure.Subscriptions;
 
 namespace Template.Api
 {
@@ -34,7 +36,8 @@ namespace Template.Api
             return services;
         }
 
-        public static IServiceCollection AddSwaggerWithVersions(this IServiceCollection services, string apiDescription, int minVersion = 1, int maxVersion = 1)
+        public static IServiceCollection AddSwaggerWithVersions(this IServiceCollection services, 
+            string apiDescription, int minVersion = 1, int maxVersion = 1)
         {
             return services.AddSwaggerGen(options =>
             {
@@ -68,10 +71,13 @@ namespace Template.Api
             return services;
         }
 
-        public static IServiceCollection AddExampleRepository(this IServiceCollection services)
+        public static IServiceCollection AddExampleRepository(this IServiceCollection services, string connectionString)
         {
-            services.AddDbContext<ExampleDbContext>();
-            services.AddScoped<IMessageRepository, MessageSqLiteRepository>();
+            services.AddDbContext<ExampleDbContext>((serviceProvider, optionsBuilder) =>
+            {
+                optionsBuilder.UseSqlite(connectionString);
+            });
+            services.AddScoped<IMessageRepository, MessageRepository>();
             return services;
         }
     }

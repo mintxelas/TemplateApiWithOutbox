@@ -3,8 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Template.Domain;
+using Template.Infrastructure.Repositories;
 
-namespace Template.Infrastructure.SqLite
+namespace Template.Infrastructure.Subscriptions
 {
     public sealed class BusSubscriptionsWithOutbox : IEventReader
     {

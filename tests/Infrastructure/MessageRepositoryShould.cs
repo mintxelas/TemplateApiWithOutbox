@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Template.Domain;
 using Template.Infrastructure.Entities;
-using Template.Infrastructure.SqLite;
+using Template.Infrastructure.EntityFramework;
+using Template.Infrastructure.Repositories;
 using Xunit;
 
 namespace Template.Infrastructure.Tests
@@ -15,14 +16,14 @@ namespace Template.Infrastructure.Tests
         private const string SomeText = "Some Text";
         private const string AChangedText = "changed text";
         private static readonly Guid APersistedId = Guid.NewGuid();
-        private readonly MessageSqLiteRepository repository;
+        private readonly MessageRepository repository;
         private readonly ExampleDbContext exampleDbContext;
 
         public MessageRepositoryShould()
         {
             var options = new DbContextOptionsBuilder<ExampleDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
             exampleDbContext = new ExampleDbContext(options);
-            repository = new MessageSqLiteRepository(exampleDbContext);
+            repository = new MessageRepository(exampleDbContext);
         }
 
         [Fact]
