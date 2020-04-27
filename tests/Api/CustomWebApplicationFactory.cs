@@ -6,6 +6,8 @@ using System;
 using System.Linq;
 using MediatR;
 using Template.Application.CreateMessage;
+using Template.Application.GetAllMessages;
+using Template.Application.GetMessageById;
 using Template.Application.ProcessMessage;
 using Template.Domain;
 using Template.Infrastructure.EntityFramework;
@@ -14,7 +16,9 @@ namespace Template.Api.Tests
 {
     public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
     {
-        public IMessageRepository MessageRepository { get; set; }
+        public IRequestHandler<GetAllMessagesRequest, GetAllMessagesResponse> GetAllMessagesHandler { get; set; }
+
+        public IRequestHandler<GetMessageByIdRequest, GetMessageByIdResponse> GetMessageByIdHandler { get; set; }
 
         public IRequestHandler<CreateMessageRequest, CreateMessageResponse> CreateMessageHandler { get; set; }
 
@@ -25,23 +29,18 @@ namespace Template.Api.Tests
             var inMemoryContextName = Guid.NewGuid().ToString();
             builder.ConfigureServices(services =>
             {
-                var exampleDbContextDescriptor =
-                    services.SingleOrDefault(s => s.ServiceType == typeof(ExampleDbContext));
-                services.Remove(exampleDbContextDescriptor);
-                services.AddDbContext<ExampleDbContext>(optionsBuilder =>
-                    optionsBuilder.UseInMemoryDatabase(inMemoryContextName));
+                var getAllMessagesDescriptor = services.SingleOrDefault(s =>
+                    s.ServiceType == typeof(IRequestHandler<GetAllMessagesRequest, GetAllMessagesResponse>));
+                services.Remove(getAllMessagesDescriptor);
+                services.AddScoped(_ => GetAllMessagesHandler);
 
-                var outboxDbContextDescriptor =
-                    services.SingleOrDefault(s => s.ServiceType == typeof(IOutboxDbContext));
-                services.Remove(outboxDbContextDescriptor);
-                services.AddDbContext<IOutboxDbContext, OutboxConsumerDbContext>(optionsBuilder =>
-                    optionsBuilder.UseInMemoryDatabase(inMemoryContextName), ServiceLifetime.Singleton);
+                var getMessageByIdDescriptor = services.SingleOrDefault(s =>
+                    s.ServiceType == typeof(IRequestHandler<GetMessageByIdRequest, GetMessageByIdResponse>));
+                services.Remove(getMessageByIdDescriptor);
+                services.AddScoped(_ => GetMessageByIdHandler);
 
-                var repositoryDescriptor = services.SingleOrDefault(s => s.ServiceType == typeof(IMessageRepository));
-                services.Remove(repositoryDescriptor);
-                services.AddScoped(_ => MessageRepository);
-
-                var createMessageDescriptor = services.SingleOrDefault(s => s.ServiceType == typeof(IRequestHandler<CreateMessageRequest, CreateMessageResponse>));
+                var createMessageDescriptor = services.SingleOrDefault(s => 
+                    s.ServiceType == typeof(IRequestHandler<CreateMessageRequest, CreateMessageResponse>));
                 services.Remove(createMessageDescriptor);
                 services.AddScoped(_ => CreateMessageHandler);
 

@@ -10,6 +10,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Template.Api.Models;
 using Template.Application.CreateMessage;
+using Template.Application.GetAllMessages;
+using Template.Application.GetMessageById;
 using Template.Application.ProcessMessage;
 using Template.Domain;
 using Xunit;
@@ -27,7 +29,10 @@ namespace Template.Api.Tests
         public MessagesControllerShould(CustomWebApplicationFactory<Startup> factory)
         {
             this.factory = factory;
-            factory.MessageRepository = Substitute.For<IMessageRepository>();
+            factory.GetAllMessagesHandler =
+                Substitute.For<IRequestHandler<GetAllMessagesRequest, GetAllMessagesResponse>>();
+            factory.GetMessageByIdHandler =
+                Substitute.For<IRequestHandler<GetMessageByIdRequest, GetMessageByIdResponse>>();
             factory.ProcessMessageHandler =
                 Substitute.For<IRequestHandler<ProcessMessageRequest, ProcessMessageResponse>>();
             factory.CreateMessageHandler =
@@ -39,9 +44,9 @@ namespace Template.Api.Tests
         public async Task return_all_repository_messages_on_get()
         {
             var expectedMessage = new Message(SomeId, SomeText);
-            factory.MessageRepository
-                .GetAll()
-                .Returns(new [] {expectedMessage});
+            factory.GetAllMessagesHandler
+                .Handle(Arg.Any<GetAllMessagesRequest>(), Arg.Any<CancellationToken>())
+                .Returns(new GetAllMessagesResponse(new[] { expectedMessage }));
 
             var response = await client.GetAsync("/messages");
 
@@ -54,17 +59,28 @@ namespace Template.Api.Tests
         [Fact]
         public async Task return_the_corresponding_message_given_an_id_on_get()
         {
-            factory.MessageRepository
-                    .GetById(SomeId)
-                    .Returns(new Message(SomeId, SomeText));
+            var expectedMessage = new Message(SomeId, SomeText);
+            factory.GetMessageByIdHandler
+                .Handle(Arg.Any<GetMessageByIdRequest>(), Arg.Any<CancellationToken>())
+                .Returns(new GetMessageByIdResponse(expectedMessage));
 
             var response = await client.GetAsync($"/messages/{SomeId}");
 
             response.EnsureSuccessStatusCode();
             var responseString = await response.Content.ReadAsStringAsync();
             var actualMessage = JsonSerializer.Deserialize<MessageDto>(responseString);
-            Assert.Equal(SomeId, actualMessage.id);
-            Assert.Equal(SomeText, actualMessage.text);
+            Assert.Equal(expectedMessage.Id, actualMessage.id);
+            Assert.Equal(expectedMessage.Text, actualMessage.text);
+        }
+
+        [Fact]
+        public async Task return_not_found_when_service_does_not_find_message_on_get()
+        {
+            factory.GetMessageByIdHandler
+                .Handle(Arg.Any<GetMessageByIdRequest>(), Arg.Any<CancellationToken>())
+                .Returns(new MessageByIdNotFoundResponse());
+            var response = await client.GetAsync($"/messages/{SomeId}");
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Fact]
