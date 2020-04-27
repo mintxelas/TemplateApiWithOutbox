@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.Runtime.InteropServices.ComTypes;
+using FluentValidation;
 
 namespace Template.Application.CreateMessage
 {
@@ -6,7 +7,7 @@ namespace Template.Application.CreateMessage
     {
         public CreateMessageValidator()
         {
-            RuleFor(x => x.Text).NotNull().NotEmpty();
+            RuleFor(x => x.Text).NotEmpty();
         }
     }
 }

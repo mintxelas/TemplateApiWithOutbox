@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Template.Application;
-using Template.Application.Application;
+using Template.Application.Behaviors;
 using Template.Application.CreateMessage;
 using Template.Domain;
 using Template.Infrastructure;
