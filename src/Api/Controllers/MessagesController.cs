@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Template.Api.Models;
 using Template.Application.CreateMessage;
+using Template.Application.GetAllMessages;
+using Template.Application.GetMessageById;
 using Template.Application.ProcessMessage;
 using Template.Domain;
 
@@ -29,21 +31,19 @@ namespace Template.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<MessageDto>> GetAll()
+        public async Task<ActionResult<MessageDto[]>> GetAll()
         {
-            var messages = await repository.GetAll();
-            if (messages is null)
-                return NotFound();
-            return Ok(messages.Select(ToDto));
+            var request = new GetAllMessagesRequest();
+            var response = await mediator.Send(request);
+            return Ok(response.Messages.Select(ToDto));
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<MessageDto>> Get([FromRoute] Guid id)
         {
-            var message = await repository.GetById(id);
-            if (message is null)
-                return NotFound();
-            return Ok(ToDto(message));
+            var request = new GetMessageByIdRequest(id);
+            var response = await mediator.Send(request);
+            return MessageByIdResponse((dynamic)response);
         }
 
         [HttpPost]
@@ -73,6 +73,28 @@ namespace Template.Api.Controllers
         private MessageDto ToDto(Message message)
             => new MessageDto { id = message.Id, text = message.Text };
 
+        private IActionResult MessageByIdResponse(MessageByIdNotFoundResponse response)
+        {
+            return NotFound();
+        }
+
+        private IActionResult MessageByIdResponse(GetMessageByIdResponse response)
+        {
+            return Ok(ToDto(response.Message));
+        }
+
+        private IActionResult CreateMessageResponse(CreateMessageSuccessResponse success)
+        {
+            logger.LogInformation("Created message with id={id} and text={text}", success.Message.Id, success.Message.Text);
+            return Ok(success.Message.Id);
+        }
+
+        private IActionResult CreateMessageResponse(CreateMessageResponse response)
+        {
+            logger.LogInformation("Error creating message: {description}", response.Description);
+            return BadRequest(response.Description);
+        }
+
         private IActionResult MessageProcessResponse(MessageToProcessNotFoundResponse response)
         {
             return NotFound();
@@ -86,18 +108,6 @@ namespace Template.Api.Controllers
         private IActionResult MessageProcessResponse(ProcessMessageResponse response)
         {
             return Ok();
-        }
-
-        private IActionResult CreateMessageResponse(CreateMessageSuccessResponse success)
-        {
-            logger.LogInformation("Created message with id={id} and text={text}", success.Message.Id, success.Message.Text);
-            return Ok(success.Message.Id);
-        }
-
-        private IActionResult CreateMessageResponse(CreateMessageResponse response)
-        {
-            logger.LogInformation("Error creating message: {description}", response.Description);
-            return BadRequest(response.Description);
         }
     }
 }
