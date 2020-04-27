@@ -1,12 +1,15 @@
+using MediatR;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Template.Api.Models;
-using Template.Application;
+using Template.Application.CreateMessage;
+using Template.Application.ProcessMessage;
 using Template.Domain;
 using Xunit;
 
@@ -15,6 +18,7 @@ namespace Template.Api.Tests
     public class MessagesControllerShould : IClassFixture<CustomWebApplicationFactory<Startup>>
     {
         private const string SomeText = "some text";
+        private const string AnyDescription = "any description";
         private static readonly Guid SomeId = Guid.NewGuid();
         private readonly CustomWebApplicationFactory<Startup> factory;
         private readonly HttpClient client;
@@ -22,10 +26,11 @@ namespace Template.Api.Tests
         public MessagesControllerShould(CustomWebApplicationFactory<Startup> factory)
         {
             this.factory = factory;
-            var mockRepository = Substitute.For<IMessageRepository>();
-            factory.MessageRepository = mockRepository;
-            var mockService = Substitute.For<MessageProcessingService>(new object[] { null });
-            factory.MessageProcessingService = mockService;
+            factory.MessageRepository = Substitute.For<IMessageRepository>();
+            factory.ProcessMessageHandler =
+                Substitute.For<IRequestHandler<ProcessMessageRequest, ProcessMessageResponse>>();
+            factory.CreateMessageHandler =
+                Substitute.For<IRequestHandler<CreateMessageRequest, CreateMessageResponse>>();
             client = this.factory.CreateClient();
         }
 
@@ -64,10 +69,9 @@ namespace Template.Api.Tests
         [Fact]
         public async Task create_a_message_on_post()
         {
-            factory.MessageProcessingService
-                .Create(SomeText)
-                .Returns(new Message(SomeId, SomeText));
-
+            factory.CreateMessageHandler
+                .Handle(Arg.Any<CreateMessageRequest>(), Arg.Any<CancellationToken>())
+                .Returns(new CreateMessageSuccessResponse(new Message(SomeId, SomeText), AnyDescription));
             var requestContent = new FormUrlEncodedContent(new [] {
                 new KeyValuePair<string, string>("text", SomeText)
             });
@@ -75,7 +79,8 @@ namespace Template.Api.Tests
             var response = await client.PostAsync("/messages", requestContent);
 
             response.EnsureSuccessStatusCode();
-            await factory.MessageProcessingService.Received().Create(SomeText);
+            await factory.CreateMessageHandler.Received()
+                .Handle(Arg.Is<CreateMessageRequest>(r => r.Text == SomeText), Arg.Any<CancellationToken>());
         }
 
         [Fact]
@@ -88,12 +93,18 @@ namespace Template.Api.Tests
 
         private async Task use_processing_service_on_put(string version, string matchingWord)
         {
+            var givenRequest = new ProcessMessageRequest(SomeId, matchingWord);
+            factory.ProcessMessageHandler
+                .Handle(Arg.Any<ProcessMessageRequest>(), Arg.Any<CancellationToken>())
+                .Returns(new ProcessMessageResponse(AnyDescription));
             client.DefaultRequestHeaders.Add("X-version", version);
 
             var response = await client.PutAsync($"/messages/process/{SomeId}", null);
 
             response.EnsureSuccessStatusCode();
-            await factory.MessageProcessingService.Received().Process(SomeId, matchingWord);  
+            await factory.ProcessMessageHandler.Received()
+                .Handle(Arg.Is<ProcessMessageRequest>(
+                    r => r.MessageId == givenRequest.MessageId && r.TextToMatch == givenRequest.TextToMatch), Arg.Any<CancellationToken>());
         }   
     }
 }

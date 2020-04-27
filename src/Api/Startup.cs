@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Template.Api.HealthChecks;
+using Template.Api.Middleware;
 using Template.Application;
 using Template.Infrastructure.EntityFramework;
 using Template.Infrastructure.Repositories;
@@ -31,7 +32,6 @@ namespace Template.Api
                 outboxReadPeriodSeconds: 10);
             services.AddExampleRepository(@"Data Source=MessagesDB.db");
             services.AddSubscriptions();
-            services.AddScoped<MessageProcessingService>();
             services.AddHealthChecks()
                 .AddDbContextCheck<ExampleDbContext>();
         }
@@ -55,6 +55,7 @@ namespace Template.Api
             });
 
             app.UseSubscriptions();
+            app.UseMiddleware<LogContextMiddleware>();
         }
     }
 }

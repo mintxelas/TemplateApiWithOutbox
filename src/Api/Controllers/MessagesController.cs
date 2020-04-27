@@ -51,13 +51,7 @@ namespace Template.Api.Controllers
         {
             var request = new CreateMessageRequest(text);
             var response = await mediator.Send(request);
-            if (response is CreateMessageSuccessResponse success)
-            {
-                logger.LogInformation("Created message with id={id} and text={text}", success.Message.Id, success.Message.Text);
-                return Ok(success.Message.Id);
-            }
-
-            return BadRequest(response.Description);
+            return CreateMessageResponse((dynamic)response);
         }
 
         [MapToApiVersion("1.0")]
@@ -72,7 +66,7 @@ namespace Template.Api.Controllers
         {
             var request = new ProcessMessageRequest(id, textToMatch);
             var response = await mediator.Send(request);
-            logger.LogInformation("Processed Put {version} with result '{description}'.", response.Description);
+            logger.LogInformation("Processed Put {version} with result '{description}'.", version, response.Description);
             return MessageProcessResponse((dynamic)response);
         }
 
@@ -94,6 +88,16 @@ namespace Template.Api.Controllers
             return Ok();
         }
 
+        private IActionResult CreateMessageResponse(CreateMessageSuccessResponse success)
+        {
+            logger.LogInformation("Created message with id={id} and text={text}", success.Message.Id, success.Message.Text);
+            return Ok(success.Message.Id);
+        }
 
+        public IActionResult CreateMessageResponse(CreateMessageResponse response)
+        {
+            logger.LogInformation("Error creating message: {description}", response.Description);
+            return BadRequest(response.Description);
+        }
     }
 }
