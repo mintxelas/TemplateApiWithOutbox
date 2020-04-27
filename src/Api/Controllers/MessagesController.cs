@@ -94,7 +94,7 @@ namespace Template.Api.Controllers
             return Ok(success.Message.Id);
         }
 
-        public IActionResult CreateMessageResponse(CreateMessageResponse response)
+        private IActionResult CreateMessageResponse(CreateMessageResponse response)
         {
             logger.LogInformation("Error creating message: {description}", response.Description);
             return BadRequest(response.Description);
