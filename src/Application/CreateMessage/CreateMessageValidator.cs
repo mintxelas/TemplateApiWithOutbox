@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices.ComTypes;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace Template.Application.CreateMessage
 {
