@@ -15,8 +15,8 @@ namespace Template.Infrastructure.EntityFramework
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<MessageRecord>().ToTable("MessageRecords").HasKey(m => m.Id);
-            modelBuilder.Entity<OutboxEvent>().ToTable("OutboxEvents").HasKey(oe => oe.Id);
+            modelBuilder.Entity<MessageRecord>().HasKey(m => m.Id);
+            modelBuilder.Entity<OutboxEvent>().HasKey(oe => oe.Id);
         }
     }
 }

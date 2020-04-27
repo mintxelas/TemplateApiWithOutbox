@@ -15,7 +15,7 @@ namespace Template.Infrastructure.EntityFramework
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<OutboxEvent>().ToTable("OutboxEvents").HasKey(oe => oe.Id); 
+            modelBuilder.Entity<OutboxEvent>().HasKey(oe => oe.Id); 
         }
 
         public Task<int> SaveChangesAsync()
