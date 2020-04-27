@@ -1,8 +1,8 @@
-﻿using System;
+﻿using NSubstitute;
+using NSubstitute.ExceptionExtensions;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using Template.Application.ProcessMessage;
 using Template.Domain;
 using Xunit;
@@ -31,6 +31,8 @@ namespace Template.Application.Tests
                 .Returns(new Message(SomeId, SomeText));
             var response = await handler.Handle(new ProcessMessageRequest(SomeId, SomeTextToMatch),
                 CancellationToken.None);
+            Assert.IsNotType<MessageToProcessNotFoundResponse>(response);
+            Assert.IsNotType<ErrorProcessingMessageResponse>(response);
             Assert.Equal("Message processed.", response.Description);
         }
 
