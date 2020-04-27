@@ -25,7 +25,7 @@ namespace Template.Application.Tests
         }
 
         [Fact]
-        public async Task return_a_sucess_response_when_processing_succeeds()
+        public async Task return_a_success_response_when_processing_succeeds()
         {
             repository.GetById(SomeId)
                 .Returns(new Message(SomeId, SomeText));
