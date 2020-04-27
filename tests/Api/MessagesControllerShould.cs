@@ -3,6 +3,7 @@ using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
@@ -67,7 +68,7 @@ namespace Template.Api.Tests
         }
 
         [Fact]
-        public async Task create_a_message_on_post()
+        public async Task return_success_when_creating_a_message_on_post()
         {
             factory.CreateMessageHandler
                 .Handle(Arg.Any<CreateMessageRequest>(), Arg.Any<CancellationToken>())
@@ -81,6 +82,21 @@ namespace Template.Api.Tests
             response.EnsureSuccessStatusCode();
             await factory.CreateMessageHandler.Received()
                 .Handle(Arg.Is<CreateMessageRequest>(r => r.Text == SomeText), Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task return_bad_request_when_message_creation_fails()
+        {
+            factory.CreateMessageHandler
+                .Handle(Arg.Any<CreateMessageRequest>(), Arg.Any<CancellationToken>())
+                .Returns(new CreateMessageResponse(AnyDescription));
+            var requestContent = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>("text", SomeText)
+            });
+
+            var response = await client.PostAsync("/messages", requestContent);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         [Fact]
@@ -105,6 +121,46 @@ namespace Template.Api.Tests
             await factory.ProcessMessageHandler.Received()
                 .Handle(Arg.Is<ProcessMessageRequest>(
                     r => r.MessageId == givenRequest.MessageId && r.TextToMatch == givenRequest.TextToMatch), Arg.Any<CancellationToken>());
-        }   
+        }
+
+        [Fact]
+        public Task return_not_found_when_processing_returns_not_found_v1() =>
+            return_not_found_when_processing_returns_not_found("1.0");
+
+        [Fact]
+        public Task return_not_found_when_processing_returns_not_found_v2() =>
+            return_not_found_when_processing_returns_not_found("2.0");
+
+        private async Task return_not_found_when_processing_returns_not_found(string version)
+        {
+            factory.ProcessMessageHandler
+                .Handle(Arg.Any<ProcessMessageRequest>(), Arg.Any<CancellationToken>())
+                .Returns(new MessageToProcessNotFoundResponse(AnyDescription));
+            client.DefaultRequestHeaders.Add("X-version", version);
+
+            var response = await client.PutAsync($"/messages/process/{SomeId}", null);
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public Task return_bad_request_when_processing_returns_error_v1() =>
+            return_bad_request_when_processing_returns_error("1.0");
+
+        [Fact]
+        public Task return_bad_request_when_processing_returns_error_v2() =>
+            return_bad_request_when_processing_returns_error("2.0");
+
+        private async Task return_bad_request_when_processing_returns_error(string version)
+        {
+            factory.ProcessMessageHandler
+                .Handle(Arg.Any<ProcessMessageRequest>(), Arg.Any<CancellationToken>())
+                .Returns(new ErrorProcessingMessageResponse(AnyDescription));
+            client.DefaultRequestHeaders.Add("X-version", version);
+
+            var response = await client.PutAsync($"/messages/process/{SomeId}", null);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
     }
 }
