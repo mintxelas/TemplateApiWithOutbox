@@ -62,31 +62,38 @@ namespace Template.Api.Controllers
 
         [MapToApiVersion("1.0")]
         [HttpPut("process/{id}")]
-        public Task<IActionResult> PutV1([FromRoute] Guid id) => Put(id, "Hello");
+        public Task<IActionResult> PutV1([FromRoute] Guid id) => Put("v1", id, "Hello");
 
         [MapToApiVersion("2.0")]
         [HttpPut("process/{id}")]
-        public Task<IActionResult> PutV2([FromRoute] Guid id) => Put(id, "World");
+        public Task<IActionResult> PutV2([FromRoute] Guid id) => Put("v2", id, "World");
 
-        private async Task<IActionResult> Put(Guid id, string textToMatch)
+        private async Task<IActionResult> Put(string version, Guid id, string textToMatch)
         {
             var request = new ProcessMessageRequest(id, textToMatch);
             var response = await mediator.Send(request);
-            if (response is MessageToProcessNotFoundResponse)
-            {
-                return NotFound();
-            }
-
-            if (response is ErrorProcessingMessageResponse error)
-            {
-                return BadRequest(error.Description);
-            }
-
-            logger.LogInformation("Processed PutV1 for messageId={id}", id);
-            return Ok();
+            logger.LogInformation("Processed Put {version} with result '{description}'.", response.Description);
+            return MessageProcessResponse((dynamic)response);
         }
 
         private MessageDto ToDto(Message message)
             => new MessageDto { id = message.Id, text = message.Text };
+
+        private IActionResult MessageProcessResponse(MessageToProcessNotFoundResponse response)
+        {
+            return NotFound();
+        }
+
+        private IActionResult MessageProcessResponse(ErrorProcessingMessageResponse error)
+        {
+            return BadRequest(error.Description);
+        }
+
+        private IActionResult MessageProcessResponse(ProcessMessageResponse response)
+        {
+            return Ok();
+        }
+
+
     }
 }
