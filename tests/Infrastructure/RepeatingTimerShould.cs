@@ -44,5 +44,25 @@ namespace Template.Infrastructure.Tests
             invokedTime.Stop();
             Assert.True(invokedTime.ElapsedMilliseconds >= 20);
         }
+
+        [Fact]
+        public void not_process_if_another_process_is_still_running()
+        {
+            var invocations = 0;
+            var timer = new RepeatingTimer(0, 5)
+            {
+                OnTick = () =>
+                {
+                    Thread.Sleep(11);
+                    invocations += 1;
+                }
+            };
+
+            while (invocations < 1)
+                Thread.Sleep(15);
+
+            timer.Dispose();
+            Assert.Equal(1, invocations);
+        }
     }
 }

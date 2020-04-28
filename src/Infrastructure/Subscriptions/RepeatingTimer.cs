@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 
 namespace Template.Infrastructure.Subscriptions
@@ -6,6 +7,26 @@ namespace Template.Infrastructure.Subscriptions
     public sealed class RepeatingTimer: IDisposable
     {
         private readonly Timer timer;
+
+        private bool processing;
+        private bool Processing
+        {
+            get
+            {
+                lock (timer)
+                {
+                    return processing;
+                }
+            }
+
+            set
+            {
+                lock (timer)
+                {
+                    processing = value;
+                }
+            }
+        }
 
         public Action OnTick { get; set; }
 
@@ -16,7 +37,18 @@ namespace Template.Infrastructure.Subscriptions
 
         private void Tick(object state)
         {
-            OnTick?.Invoke();
+            if (!Processing)
+            {
+                try
+                {
+                    Processing = true;
+                    OnTick?.Invoke();
+                }
+                finally
+                {
+                    Processing = false;
+                }
+            }
         }
 
         public void Dispose()
