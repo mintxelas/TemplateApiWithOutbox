@@ -83,11 +83,11 @@ namespace Template.Api
 
         public static IServiceCollection AddMediatorWithBehaviors(this IServiceCollection services)
         {
-            services.AddMediatR(typeof(CreateMessageResponse).Assembly);
+            services.AddMediatR(typeof(Placeholder).Assembly);
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidatorPipelineBehavior<,>));
             services.Scan(scan => scan
-                .FromAssemblyOf<CreateMessageValidator>()
+                .FromAssemblyOf<Placeholder>()
                 .AddClasses(@class => @class.AssignableTo(typeof(IValidator<>)))
                 .AsImplementedInterfaces());
             return services;
