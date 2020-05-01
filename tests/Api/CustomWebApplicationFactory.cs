@@ -1,16 +1,15 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using MediatR;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.IO;
 using System.Linq;
-using MediatR;
 using Template.Application.CreateMessage;
 using Template.Application.GetAllMessages;
 using Template.Application.GetMessageById;
 using Template.Application.ProcessMessage;
-using Template.Domain;
-using Template.Infrastructure.EntityFramework;
 
 namespace Template.Api.Tests
 {
@@ -23,6 +22,19 @@ namespace Template.Api.Tests
         public IRequestHandler<CreateMessageRequest, CreateMessageResponse> CreateMessageHandler { get; set; }
 
         public IRequestHandler<ProcessMessageRequest, ProcessMessageResponse> ProcessMessageHandler { get; set; }
+
+        public void Configure()
+        {
+            this.WithWebHostBuilder(builder =>
+            {
+                var projectDir = Directory.GetCurrentDirectory();
+                var configPath = Path.Combine(projectDir, "appsettings.json");
+                builder.ConfigureAppConfiguration((context, configurationBuilder) =>
+                {
+                    configurationBuilder.AddJsonFile(configPath);
+                });
+            });
+        }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
