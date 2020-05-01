@@ -22,22 +22,15 @@ namespace Template.Api.Tests
         public IRequestHandler<CreateMessageRequest, CreateMessageResponse> CreateMessageHandler { get; set; }
 
         public IRequestHandler<ProcessMessageRequest, ProcessMessageResponse> ProcessMessageHandler { get; set; }
-
-        public void Configure()
-        {
-            this.WithWebHostBuilder(builder =>
-            {
-                var projectDir = Directory.GetCurrentDirectory();
-                var configPath = Path.Combine(projectDir, "appsettings.json");
-                builder.ConfigureAppConfiguration((context, configurationBuilder) =>
-                {
-                    configurationBuilder.AddJsonFile(configPath);
-                });
-            });
-        }
-
+        
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            var projectDir = Directory.GetCurrentDirectory();
+            var configPath = Path.Combine(projectDir, "appsettings.json");
+            builder.ConfigureAppConfiguration((context, configurationBuilder) =>
+            {
+                configurationBuilder.AddJsonFile(configPath);
+            });
             var inMemoryContextName = Guid.NewGuid().ToString();
             builder.ConfigureServices(services =>
             {
