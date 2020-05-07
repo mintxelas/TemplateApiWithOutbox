@@ -17,13 +17,13 @@ namespace Template.Infrastructure.Tests
         private const string AChangedText = "changed text";
         private static readonly Guid APersistedId = Guid.NewGuid();
         private readonly MessageRepository repository;
-        private readonly ExampleDbContext exampleDbContext;
+        private readonly MessageDbContext messageDbContext;
 
         public MessageRepositoryShould()
         {
-            var options = new DbContextOptionsBuilder<ExampleDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
-            exampleDbContext = new ExampleDbContext(options);
-            repository = new MessageRepository(exampleDbContext);
+            var options = new DbContextOptionsBuilder<MessageDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+            messageDbContext = new MessageDbContext(options);
+            repository = new MessageRepository(messageDbContext);
         }
 
         [Fact]
@@ -49,7 +49,7 @@ namespace Template.Infrastructure.Tests
 
             await repository.Save(expectedMessage);
 
-            var actualMessage = exampleDbContext.MessageRecords.Single();
+            var actualMessage = messageDbContext.MessageRecords.Single();
             Assert.Equal(expectedMessage.Text, actualMessage.Text);
         }
 
@@ -61,7 +61,7 @@ namespace Template.Infrastructure.Tests
 
             var actualMessage = await repository.Save(givenMessage);
 
-            var outboxEvent = exampleDbContext.OutboxEvents.Single(oe =>
+            var outboxEvent = messageDbContext.OutboxEvents.Single(oe =>
                 oe.EventName == typeof(MatchingMessageReceived).AssemblyQualifiedName);
             var actualEvent = (MatchingMessageReceived)JsonSerializer.Deserialize(outboxEvent.Payload, Type.GetType(outboxEvent.EventName));
             Assert.Equal(givenMessage.Id, actualEvent.MessageId);
@@ -79,14 +79,14 @@ namespace Template.Infrastructure.Tests
                 Id = APersistedId,
                 Text = SomeText
             };
-            _ = await exampleDbContext.MessageRecords.AddAsync(messageRecord);
-            await exampleDbContext.SaveChangesAsync();
+            _ = await messageDbContext.MessageRecords.AddAsync(messageRecord);
+            await messageDbContext.SaveChangesAsync();
             return new Message(APersistedId, SomeText);
         }
 
         public void Dispose()
         {
-            exampleDbContext?.Dispose();
+            messageDbContext?.Dispose();
         }
     }
 }

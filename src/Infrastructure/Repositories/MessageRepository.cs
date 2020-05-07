@@ -11,9 +11,9 @@ namespace Template.Infrastructure.Repositories
 {
     public class MessageRepository : IMessageRepository
     {
-        private readonly ExampleDbContext dbContext;
+        private readonly MessageDbContext dbContext;
 
-        public MessageRepository(ExampleDbContext dbContext)
+        public MessageRepository(MessageDbContext dbContext)
             => this.dbContext = dbContext;
 
         public Task<Message[]> GetAll()

@@ -1,13 +1,18 @@
 ﻿using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using System.Collections.Generic;
 using System.Linq;
+using Template.Api.Middleware;
 using Template.Application;
 using Template.Application.Behaviors;
-using Template.Application.CreateMessage;
 using Template.Domain;
+using Template.Infrastructure.Configuration;
 using Template.Infrastructure.EntityFramework;
 using Template.Infrastructure.Repositories;
 using Template.Infrastructure.Subscriptions;
@@ -48,19 +53,35 @@ namespace Template.Api
             });
         }
 
-        public static IServiceCollection AddOutboxSupport<TOutboxDbContext, TOutboxRepository>(
-            this IServiceCollection services, string connectionString, long outboxReadDueSeconds, long outboxReadPeriodSeconds)
-            where TOutboxDbContext : DbContext, IOutboxDbContext
-            where TOutboxRepository : class, IOutboxRepository
+        public static IServiceCollection AddOutboxSupport(
+            this IServiceCollection services)
         {
-            services.AddDbContext<IOutboxDbContext, TOutboxDbContext>(
+            services.AddDbContext<MessageDbContext>(
                 (serviceProvider, optionsBuilder) =>
                 {
+                    var connectionString = serviceProvider.GetRequiredService<OutBoxConfiguration>().Database;
+                    optionsBuilder.UseSqlite(connectionString);
+                });
+            services.AddDbContext<IOutboxDbContext, OutboxConsumerDbContext>(
+                (serviceProvider, optionsBuilder) =>
+                {
+                    var connectionString = serviceProvider.GetRequiredService<OutBoxConfiguration>().Database;
                     optionsBuilder.UseSqlite(connectionString);
                 }, ServiceLifetime.Singleton);
-            services.AddSingleton<IOutboxRepository, TOutboxRepository>();
-            services.AddSingleton(_ => new RepeatingTimer(outboxReadDueSeconds * 1000, outboxReadPeriodSeconds * 1000));
+            services.AddScoped<IMessageRepository, MessageRepository>();
+            services.AddSingleton<IOutboxRepository, OutboxRepository>();
+            services.AddSingleton<RepeatingTimer>();
             services.AddSingleton<IEventReader, BusSubscriptionsWithOutbox>();
+            return services;
+        }
+
+        public static IServiceCollection AddCustomConfiguration(this IServiceCollection services, IConfiguration configurationSection)
+        {
+            services.Configure<OutBoxConfiguration>(configurationSection);
+            services.AddSingleton(serviceProvider =>
+                serviceProvider.GetRequiredService<IOptions<OutBoxConfiguration>>().Value);
+            services.AddSingleton(serviceProvider =>
+                serviceProvider.GetRequiredService<IOptions<OutBoxConfiguration>>().Value.Timer);
             return services;
         }
 
@@ -68,16 +89,6 @@ namespace Template.Api
         {
             services.AddTransient<NotificationsContextSubscriptions>();
             services.AddTransient<MonitoringContextSubscriptions>();
-            return services;
-        }
-
-        public static IServiceCollection AddExampleRepository(this IServiceCollection services, string connectionString)
-        {
-            services.AddDbContext<ExampleDbContext>((serviceProvider, optionsBuilder) =>
-            {
-                optionsBuilder.UseSqlite(connectionString);
-            });
-            services.AddScoped<IMessageRepository, MessageRepository>();
             return services;
         }
 
@@ -91,6 +102,17 @@ namespace Template.Api
                 .AddClasses(@class => @class.AssignableTo(typeof(IValidator<>)))
                 .AsImplementedInterfaces());
             return services;
+        }
+
+        public static void AddConfigurationValidation(this IServiceCollection services)
+        {
+            services.AddTransient<IStartupFilter, ValidateConfigurationStartupFilter>();
+            services.AddSingleton<IEnumerable<IValidateConfiguration>>(serviceProvider =>
+                new IValidateConfiguration[]
+                {
+                    serviceProvider.GetRequiredService<OutBoxConfiguration>(),
+                    serviceProvider.GetRequiredService<TimerConfiguration>()
+                });
         }
     }
 }

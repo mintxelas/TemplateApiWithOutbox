@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Template.Infrastructure.Configuration;
 
 namespace Template.Infrastructure.Subscriptions
 {
@@ -29,9 +30,11 @@ namespace Template.Infrastructure.Subscriptions
 
         public Action OnTick { get; set; }
 
-        public RepeatingTimer(long dueTimeMilliseconds, long periodMilliseconds)
+        public RepeatingTimer(TimerConfiguration configuration)
         {
-            timer = new Timer(Tick, null, dueTimeMilliseconds, periodMilliseconds);
+            var due = configuration.DueSeconds > 0 ? configuration.DueSeconds * 1000 : configuration.DueSeconds;
+            var period = configuration.PeriodSeconds > 0 ? configuration.PeriodSeconds * 1000 : configuration.PeriodSeconds;
+            timer = new Timer(Tick, null, due, period);
         }
 
         private void Tick(object state)

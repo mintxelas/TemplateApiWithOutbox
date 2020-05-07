@@ -5,9 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Template.Api.HealthChecks;
 using Template.Api.Middleware;
-using Template.Application;
 using Template.Infrastructure.EntityFramework;
-using Template.Infrastructure.Repositories;
 
 namespace Template.Api
 {
@@ -26,17 +24,15 @@ namespace Template.Api
             services.AddMediatorWithBehaviors();
             services.AddVersionedApi(defaultApiVersion: 1);
             services.AddSwaggerWithVersions("Template Api", 1, 2);
-            services.AddOutboxSupport<OutboxConsumerDbContext, OutboxRepository>(
-                connectionString: @"Data Source=MessagesDB.db",
-                outboxReadDueSeconds: 10, 
-                outboxReadPeriodSeconds: 10);
-            services.AddExampleRepository(@"Data Source=MessagesDB.db");
+            services.AddCustomConfiguration(configuration.GetSection("OutBox"));
+            services.AddConfigurationValidation();
+            services.AddOutboxSupport();
             services.AddSubscriptions();
             services.AddHealthChecks()
-                .AddDbContextCheck<ExampleDbContext>();
+                .AddDbContextCheck<MessageDbContext>();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ExampleDbContext dbContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, MessageDbContext dbContext)
         {
             if (env.IsDevelopment())
             {
