@@ -1,10 +1,10 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using Template.Domain;
 
-namespace Template.Application
+namespace Template.Application.Subscriptions
 {
-    public class NotificationsContextSubscriptions
+    public class NotificationsContextSubscriptions: ISubscribeToContextEvents
     {
         private readonly ILogger logger;
         private readonly IEventReader bus;

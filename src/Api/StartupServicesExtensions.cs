@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Template.Api.Middleware;
 using Template.Application;
-using Template.Application.Behaviors;
+using Template.Application.Subscriptions;
 using Template.Domain;
 using Template.Infrastructure.Configuration;
 using Template.Infrastructure.EntityFramework;
@@ -87,16 +87,20 @@ namespace Template.Api
 
         public static IServiceCollection AddSubscriptions(this IServiceCollection services)
         {
-            services.AddTransient<NotificationsContextSubscriptions>();
-            services.AddTransient<MonitoringContextSubscriptions>();
+            services.Scan(scan => scan
+                .FromAssemblyOf<Application.Placeholder>()
+                .AddClasses(@class => @class.AssignableTo<ISubscribeToContextEvents>())
+                .AsImplementedInterfaces());
             return services;
         }
 
         public static IServiceCollection AddMediatorWithBehaviors(this IServiceCollection services)
         {
             services.AddMediatR(typeof(Placeholder).Assembly);
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehavior<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidatorPipelineBehavior<,>));
+            services.Scan(scan => scan
+                .FromAssemblyOf<Application.Placeholder>()
+                .AddClasses(@class => @class.AssignableTo(typeof(IPipelineBehavior<,>)))
+                .AsImplementedInterfaces());
             services.Scan(scan => scan
                 .FromAssemblyOf<Placeholder>()
                 .AddClasses(@class => @class.AssignableTo(typeof(IValidator<>)))

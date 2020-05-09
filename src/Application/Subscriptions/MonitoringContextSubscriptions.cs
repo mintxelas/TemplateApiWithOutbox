@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Template.Domain;
 
-namespace Template.Application
+namespace Template.Application.Subscriptions
 {
-    public class MonitoringContextSubscriptions
+    public class MonitoringContextSubscriptions: ISubscribeToContextEvents
     {
         private readonly ILogger logger;
         private readonly IEventReader bus;
