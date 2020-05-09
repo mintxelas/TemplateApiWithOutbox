@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Threading;
+using Template.Infrastructure.Configuration;
 using Template.Infrastructure.Subscriptions;
 using Xunit;
 
@@ -13,7 +14,7 @@ namespace Template.Infrastructure.Tests
             var invokedTime = new Stopwatch();
             invokedTime.Start();
             var invocations = 0;
-            var timer = new RepeatingTimer(10, -1)
+            var timer = new RepeatingTimer(new TimerConfiguration() { DueSeconds = 1, PeriodSeconds = -1 })
             {
                 OnTick = () => invocations += 1
             };
@@ -32,7 +33,7 @@ namespace Template.Infrastructure.Tests
             var invokedTime = new Stopwatch();
             invokedTime.Start();
             var invocations = 0;
-            var timer = new RepeatingTimer(0, 10)
+            var timer = new RepeatingTimer(new TimerConfiguration() { DueSeconds = 0, PeriodSeconds = 1 })
             {
                 OnTick = () => invocations += 1
             };
@@ -49,7 +50,7 @@ namespace Template.Infrastructure.Tests
         public void not_process_if_another_process_is_still_running()
         {
             var invocations = 0;
-            var timer = new RepeatingTimer(0, 5)
+            var timer = new RepeatingTimer(new TimerConfiguration() { DueSeconds = 0, PeriodSeconds = 1 })
             {
                 OnTick = () =>
                 {

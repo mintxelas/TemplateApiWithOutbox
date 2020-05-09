@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Template.Application;
+using System.Collections.Generic;
 using Template.Application.Subscriptions;
 
 namespace Template.Api
@@ -26,8 +25,11 @@ namespace Template.Api
 
         public static IApplicationBuilder UseSubscriptions(this IApplicationBuilder app)
         {
-            app.ApplicationServices.GetService<NotificationsContextSubscriptions>().InitializeSubscriptions();
-            app.ApplicationServices.GetService<MonitoringContextSubscriptions>().InitializeSubscriptions();
+            var subscribers = app.ApplicationServices.GetService<IEnumerable<ISubscribeToContextEvents>>();
+            foreach (var subscriber in subscribers)
+            {
+                subscriber.InitializeSubscriptions();
+            }
             return app;
         }
     }
