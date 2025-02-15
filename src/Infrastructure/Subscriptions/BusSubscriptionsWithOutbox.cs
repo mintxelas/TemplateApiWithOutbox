@@ -49,9 +49,9 @@ public sealed class BusSubscriptionsWithOutbox : IEventReader
     private void Publish(IDomainEvent domainEvent)
     {
         var key = domainEvent.GetType();
-        if (Subscribers.ContainsKey(key))
+        if (Subscribers.TryGetValue(key, out var subscriber))
         {
-            foreach (var handler in Subscribers[key])
+            foreach (var handler in subscriber)
             {
                 try
                 {
