@@ -1,14 +1,8 @@
 ﻿using Sample.Domain;
 
-namespace Sample.Application.GetAllMessages
-{
-    public class GetAllMessagesResponse
-    {
-        public Message[] Messages { get; }
+namespace Sample.Application.GetAllMessages;
 
-        public GetAllMessagesResponse(Message[] messages)
-        {
-            Messages = messages;
-        }
-    }
+public class GetAllMessagesResponse(Message[] messages)
+{
+    public Message[] Messages { get; } = messages;
 }

@@ -1,14 +1,8 @@
 ﻿using MediatR;
 
-namespace Sample.Application.CreateMessage
-{
-    public class CreateMessageRequest: IRequest<CreateMessageResponse>
-    {
-        public string Text { get; }
+namespace Sample.Application.CreateMessage;
 
-        public CreateMessageRequest(string text)
-        {
-            Text = text;
-        }
-    }
+public class CreateMessageRequest(string text) : IRequest<CreateMessageResponse>
+{
+    public string Text { get; } = text;
 }

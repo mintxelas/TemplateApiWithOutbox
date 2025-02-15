@@ -1,24 +1,13 @@
 ﻿using Sample.Domain;
 
-namespace Sample.Application.CreateMessage
+namespace Sample.Application.CreateMessage;
+
+public class CreateMessageResponse(string description)
 {
-    public class CreateMessageResponse
-    {
-        public string Description { get; }
+    public string Description { get; } = description;
+}
 
-        public CreateMessageResponse(string description)
-        {
-            Description = description;
-        }
-    }
-
-    public class CreateMessageSuccessResponse: CreateMessageResponse
-    {
-        public Message Message { get; }
-
-        public CreateMessageSuccessResponse(Message message, string description): base(description)
-        {
-            Message = message;
-        }
-    }
+public class CreateMessageSuccessResponse(Message message, string description) : CreateMessageResponse(description)
+{
+    public Message Message { get; } = message;
 }

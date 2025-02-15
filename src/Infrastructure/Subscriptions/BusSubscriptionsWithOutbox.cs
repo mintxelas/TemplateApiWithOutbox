@@ -5,70 +5,69 @@ using Microsoft.Extensions.Logging;
 using Sample.Domain;
 using Sample.Infrastructure.Repositories;
 
-namespace Sample.Infrastructure.Subscriptions
+namespace Sample.Infrastructure.Subscriptions;
+
+public sealed class BusSubscriptionsWithOutbox : IEventReader
 {
-    public sealed class BusSubscriptionsWithOutbox : IEventReader
+    private static readonly ConcurrentDictionary<Type, List<Action<IDomainEvent>>> Subscribers 
+        = new ConcurrentDictionary<Type, List<Action<IDomainEvent>>>();
+
+    private readonly ILogger<BusSubscriptionsWithOutbox> logger;
+    private readonly IOutboxRepository repository;
+    private readonly RepeatingTimer timer;
+
+    public BusSubscriptionsWithOutbox(ILogger<BusSubscriptionsWithOutbox> logger, IOutboxRepository repository, RepeatingTimer timer)
     {
-        private static readonly ConcurrentDictionary<Type, List<Action<DomainEvent>>> Subscribers 
-            = new ConcurrentDictionary<Type, List<Action<DomainEvent>>>();
+        this.logger = logger;
+        this.repository = repository;
+        this.timer = timer;
+        this.timer.OnTick = OnTick;
+    }
 
-        private readonly ILogger<BusSubscriptionsWithOutbox> logger;
-        private readonly IOutboxRepository repository;
-        private readonly RepeatingTimer timer;
+    public void Subscribe<T>(Action<T> handler) where T : IDomainEvent
+    {
+        var key = typeof(T);
+        var wrapper = new Action<IDomainEvent>(evt => handler((T)evt));
 
-        public BusSubscriptionsWithOutbox(ILogger<BusSubscriptionsWithOutbox> logger, IOutboxRepository repository, RepeatingTimer timer)
-        {
-            this.logger = logger;
-            this.repository = repository;
-            this.timer = timer;
-            this.timer.OnTick = OnTick;
-        }
-
-        public void Subscribe<T>(Action<T> handler) where T : DomainEvent
-        {
-            var key = typeof(T);
-            var wrapper = new Action<DomainEvent>(evt => handler((T)evt));
-
-            Subscribers.AddOrUpdate(key,
-                    new List<Action<DomainEvent>> { wrapper },
-                    (type, handlers) =>
-                    {
-                        handlers.Add(wrapper);
-                        return handlers;
-                    });
-        }
-
-        private void OnTick()
-        {
-            foreach (var @event in repository.PendingEvents())
+        Subscribers.AddOrUpdate(key,
+            new List<Action<IDomainEvent>> { wrapper },
+            (type, handlers) =>
             {
-                Publish(@event);
-            }
-        }
+                handlers.Add(wrapper);
+                return handlers;
+            });
+    }
 
-        private void Publish(DomainEvent domainEvent)
+    private void OnTick()
+    {
+        foreach (var @event in repository.PendingEvents())
         {
-            var key = domainEvent.GetType();
-            if (Subscribers.ContainsKey(key))
+            Publish(@event);
+        }
+    }
+
+    private void Publish(IDomainEvent domainEvent)
+    {
+        var key = domainEvent.GetType();
+        if (Subscribers.ContainsKey(key))
+        {
+            foreach (var handler in Subscribers[key])
             {
-                foreach (var handler in Subscribers[key])
+                try
                 {
-                    try
-                    {
-                        handler(domainEvent);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(ex, "Exception handling event of type {eventType}", key.Name);
-                    }
+                    handler(domainEvent);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Exception handling event of type {eventType}", key.Name);
                 }
             }
         }
+    }
 
-        public void Dispose()
-        {
-            Subscribers?.Clear();
-            timer?.Dispose();
-        }
+    public void Dispose()
+    {
+        Subscribers?.Clear();
+        timer?.Dispose();
     }
 }

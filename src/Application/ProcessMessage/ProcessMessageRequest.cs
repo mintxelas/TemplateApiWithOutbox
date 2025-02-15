@@ -1,17 +1,10 @@
 ﻿using MediatR;
 using System;
 
-namespace Sample.Application.ProcessMessage
-{
-    public class ProcessMessageRequest: IRequest<ProcessMessageResponse>
-    {
-        public Guid MessageId { get; }
-        public string TextToMatch { get; }
+namespace Sample.Application.ProcessMessage;
 
-        public ProcessMessageRequest(Guid messageId, string textToMatch)
-        {
-            TextToMatch = textToMatch;
-            MessageId = messageId;
-        }
-    }
+public class ProcessMessageRequest(Guid messageId, string textToMatch) : IRequest<ProcessMessageResponse>
+{
+    public Guid MessageId { get; } = messageId;
+    public string TextToMatch { get; } = textToMatch;
 }

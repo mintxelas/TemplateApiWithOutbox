@@ -1,7 +1,6 @@
-﻿namespace Sample.Infrastructure.Configuration
+﻿namespace Sample.Infrastructure.Configuration;
+
+public interface IValidateConfiguration
 {
-    public interface IValidateConfiguration
-    {
-        void Validate();
-    }
+    void Validate();
 }

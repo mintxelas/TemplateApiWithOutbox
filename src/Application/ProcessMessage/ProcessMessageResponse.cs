@@ -1,28 +1,10 @@
-﻿namespace Sample.Application.ProcessMessage
+﻿namespace Sample.Application.ProcessMessage;
+
+public class ProcessMessageResponse(string description)
 {
-    public class ProcessMessageResponse
-    {
-        public string Description { get; }
-
-        public ProcessMessageResponse(string description)
-        {
-            Description = description;
-        }
-    }
-
-    public class MessageToProcessNotFoundResponse : ProcessMessageResponse
-    {
-        public MessageToProcessNotFoundResponse(string description): base(description)
-        {
-            
-        }
-    }
-
-    public class ErrorProcessingMessageResponse : ProcessMessageResponse
-    {
-        public ErrorProcessingMessageResponse(string error): base(error)
-        {
-            
-        }
-    }
+    public string Description { get; } = description;
 }
+
+public class MessageToProcessNotFoundResponse(string description) : ProcessMessageResponse(description);
+
+public class ErrorProcessingMessageResponse(string error) : ProcessMessageResponse(error);

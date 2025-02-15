@@ -1,12 +1,11 @@
 ﻿using FluentValidation;
 
-namespace Sample.Application.ProcessMessage
+namespace Sample.Application.ProcessMessage;
+
+public class ProcessMessageValidator: AbstractValidator<ProcessMessageRequest>
 {
-    public class ProcessMessageValidator: AbstractValidator<ProcessMessageRequest>
+    public ProcessMessageValidator()
     {
-        public ProcessMessageValidator()
-        {
-            RuleFor(x => x.MessageId).NotEqual(_ => default);
-        }
+        RuleFor(x => x.MessageId).NotEqual(_ => default);
     }
 }

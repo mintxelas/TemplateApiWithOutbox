@@ -1,12 +1,11 @@
 ﻿using FluentValidation;
 
-namespace Sample.Application.CreateMessage
+namespace Sample.Application.CreateMessage;
+
+public class CreateMessageValidator : AbstractValidator<CreateMessageRequest>
 {
-    public class CreateMessageValidator : AbstractValidator<CreateMessageRequest>
+    public CreateMessageValidator()
     {
-        public CreateMessageValidator()
-        {
-            RuleFor(x => x.Text).NotEmpty();
-        }
+        RuleFor(x => x.Text).NotEmpty();
     }
 }

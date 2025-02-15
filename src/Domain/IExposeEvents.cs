@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace Sample.Domain
+namespace Sample.Domain;
+
+public interface IExposeEvents
 {
-    public interface IExposeEvents
-    {
-        IEnumerable<DomainEvent> PendingEvents { get; }
-        void ClearPendingEvents();
-    }
+    IEnumerable<IDomainEvent> PendingEvents { get; }
+    void ClearPendingEvents();
 }

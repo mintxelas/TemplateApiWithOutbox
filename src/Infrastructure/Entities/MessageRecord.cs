@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace Sample.Infrastructure.Entities
+namespace Sample.Infrastructure.Entities;
+
+public class MessageRecord
 {
-    public class MessageRecord
-    {
-        public Guid Id { get; set; }
-        public string Text { get; set; }
-    }
+    public Guid Id { get; set; }
+    public string Text { get; set; }
 }

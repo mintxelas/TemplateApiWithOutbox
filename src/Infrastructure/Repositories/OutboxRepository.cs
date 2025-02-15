@@ -6,34 +6,26 @@ using Sample.Domain;
 using Sample.Infrastructure.Entities;
 using Sample.Infrastructure.EntityFramework;
 
-namespace Sample.Infrastructure.Repositories
+namespace Sample.Infrastructure.Repositories;
+
+public class OutboxRepository(IOutboxDbContext dbContext) : IOutboxRepository
 {
-    public class OutboxRepository : IOutboxRepository
+    public virtual IEnumerable<IDomainEvent> PendingEvents()
     {
-        private readonly IOutboxDbContext dbContext;
-
-        public OutboxRepository(IOutboxDbContext dbContext)
+        foreach(var outboxEvent in dbContext.OutboxEvents
+                    .Where(oe => !oe.ProcessedDate.HasValue)
+                    .OrderBy(oe => oe.Id))
         {
-            this.dbContext = dbContext;
+            outboxEvent.ProcessedDate = DateTimeOffset.Now;
+            dbContext.SaveChanges();
+            yield return ToDomainEvent(outboxEvent);
         }
+    }
 
-        public virtual IEnumerable<DomainEvent> PendingEvents()
-        {
-            foreach(var outboxEvent in dbContext.OutboxEvents
-                .Where(oe => !oe.ProcessedDate.HasValue)
-                .OrderBy(oe => oe.Id))
-            {
-                outboxEvent.ProcessedDate = DateTimeOffset.Now;
-                dbContext.SaveChanges();
-                yield return ToDomainEvent(outboxEvent);
-            }
-        }
-
-        private DomainEvent ToDomainEvent(OutboxEvent outboxEvent)
-        {
-            var eventType = Type.GetType(outboxEvent.EventName);
-            var domainEvent = JsonSerializer.Deserialize(outboxEvent.Payload, eventType);
-            return (DomainEvent)domainEvent;
-        }
+    private IDomainEvent ToDomainEvent(OutboxEvent outboxEvent)
+    {
+        var eventType = Type.GetType(outboxEvent.EventName);
+        var domainEvent = JsonSerializer.Deserialize(outboxEvent.Payload, eventType);
+        return (IDomainEvent)domainEvent;
     }
 }

@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Sample.Domain
+namespace Sample.Domain;
+
+public class MatchingMessageReceived : IDomainEvent
 {
-    public class MatchingMessageReceived : DomainEvent
-    {
-        public Guid MessageId { get; set; }
-    }
+    public Guid MessageId { get; set; }
 }

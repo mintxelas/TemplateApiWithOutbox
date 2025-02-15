@@ -1,6 +1,5 @@
-﻿namespace Sample.Application
+﻿namespace Sample.Application;
+
+public sealed class Placeholder
 {
-    public sealed class Placeholder
-    {
-    }
 }

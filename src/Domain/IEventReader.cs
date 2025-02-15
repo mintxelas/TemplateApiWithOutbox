@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Sample.Domain
+namespace Sample.Domain;
+
+public interface IEventReader : IDisposable
 {
-    public interface IEventReader : IDisposable
-    {
-        void Subscribe<T>(Action<T> handler) where T : DomainEvent;
-    }
+    void Subscribe<T>(Action<T> handler) where T : IDomainEvent;
 }

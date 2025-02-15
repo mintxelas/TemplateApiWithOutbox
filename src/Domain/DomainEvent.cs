@@ -1,7 +1,6 @@
-﻿namespace Sample.Domain
+﻿namespace Sample.Domain;
+
+public interface IDomainEvent
 {
-    public interface DomainEvent
-    {
         
-    }
 }

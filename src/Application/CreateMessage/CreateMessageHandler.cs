@@ -4,29 +4,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sample.Domain;
 
-namespace Sample.Application.CreateMessage
+namespace Sample.Application.CreateMessage;
+
+public class CreateMessageHandler(IMessageRepository repository)
+    : IRequestHandler<CreateMessageRequest, CreateMessageResponse>
 {
-    public class CreateMessageHandler : IRequestHandler<CreateMessageRequest, CreateMessageResponse>
+    public async Task<CreateMessageResponse> Handle(CreateMessageRequest request, CancellationToken cancellationToken)
     {
-        private readonly IMessageRepository repository;
-
-        public CreateMessageHandler(IMessageRepository repository)
+        try
         {
-            this.repository = repository;
+            var messageToCreate = new Message(request.Text);
+            var createdMessage = await repository.Save(messageToCreate);
+            return new CreateMessageSuccessResponse(createdMessage, "Message successfully created.");
         }
-
-        public async Task<CreateMessageResponse> Handle(CreateMessageRequest request, CancellationToken cancellationToken)
+        catch (Exception e)
         {
-            try
-            {
-                var messageToCreate = new Message(request.Text);
-                var createdMessage = await repository.Save(messageToCreate);
-                return new CreateMessageSuccessResponse(createdMessage, "Message successfully created.");
-            }
-            catch (Exception e)
-            {
-                return new CreateMessageResponse(e.Message);
-            }
+            return new CreateMessageResponse(e.Message);
         }
     }
 }

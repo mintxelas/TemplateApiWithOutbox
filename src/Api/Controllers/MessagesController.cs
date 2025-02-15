@@ -12,103 +12,94 @@ using Sample.Application.GetMessageById;
 using Sample.Application.ProcessMessage;
 using Sample.Domain;
 
-namespace Sample.Api.Controllers
+namespace Sample.Api.Controllers;
+
+[ApiVersion("1.0")]
+[ApiVersion("2.0")]
+[ApiController]
+[Route("[controller]")]
+public class MessagesController(IMessageRepository repository, IMediator mediator, ILogger<MessagesController> logger)
+    : ControllerBase
 {
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
-    [ApiController]
-    [Route("[controller]")]
-    public class MessagesController : ControllerBase
+    private readonly IMessageRepository repository = repository;
+
+    [HttpGet]
+    public async Task<ActionResult<MessageDto[]>> GetAll()
     {
-        private readonly IMessageRepository repository;
-        private readonly IMediator mediator;
-        private readonly ILogger<MessagesController> logger;
+        var request = new GetAllMessagesRequest();
+        var response = await mediator.Send(request);
+        return Ok(response.Messages.Select(ToDto));
+    }
 
-        public MessagesController(IMessageRepository repository, IMediator mediator, ILogger<MessagesController> logger)
-        {
-            this.repository = repository;
-            this.mediator = mediator;
-            this.logger = logger;
-        }
+    [HttpGet("{id}")]
+    public async Task<ActionResult<MessageDto>> Get([FromRoute] Guid id)
+    {
+        var request = new GetMessageByIdRequest(id);
+        var response = await mediator.Send(request);
+        return MessageByIdResponse((dynamic)response);
+    }
 
-        [HttpGet]
-        public async Task<ActionResult<MessageDto[]>> GetAll()
-        {
-            var request = new GetAllMessagesRequest();
-            var response = await mediator.Send(request);
-            return Ok(response.Messages.Select(ToDto));
-        }
+    [HttpPost]
+    public async Task<ActionResult<Guid>> Post([FromForm] string text)
+    {
+        var request = new CreateMessageRequest(text);
+        var response = await mediator.Send(request);
+        return CreateMessageResponse((dynamic)response);
+    }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<MessageDto>> Get([FromRoute] Guid id)
-        {
-            var request = new GetMessageByIdRequest(id);
-            var response = await mediator.Send(request);
-            return MessageByIdResponse((dynamic)response);
-        }
+    [MapToApiVersion("1.0")]
+    [HttpPut("process/{id}")]
+    public Task<IActionResult> PutV1([FromRoute] Guid id) => Put("v1", id, "Hello");
 
-        [HttpPost]
-        public async Task<ActionResult<Guid>> Post([FromForm] string text)
-        {
-            var request = new CreateMessageRequest(text);
-            var response = await mediator.Send(request);
-            return CreateMessageResponse((dynamic)response);
-        }
+    [MapToApiVersion("2.0")]
+    [HttpPut("process/{id}")]
+    public Task<IActionResult> PutV2([FromRoute] Guid id) => Put("v2", id, "World");
 
-        [MapToApiVersion("1.0")]
-        [HttpPut("process/{id}")]
-        public Task<IActionResult> PutV1([FromRoute] Guid id) => Put("v1", id, "Hello");
+    private async Task<IActionResult> Put(string version, Guid id, string textToMatch)
+    {
+        var request = new ProcessMessageRequest(id, textToMatch);
+        var response = await mediator.Send(request);
+        logger.LogInformation("Processed Put {version} with result '{description}'.", version, response.Description);
+        return MessageProcessResponse((dynamic)response);
+    }
 
-        [MapToApiVersion("2.0")]
-        [HttpPut("process/{id}")]
-        public Task<IActionResult> PutV2([FromRoute] Guid id) => Put("v2", id, "World");
+    private MessageDto ToDto(Message message)
+        => new MessageDto { Id = message.Id, Text = message.Text };
 
-        private async Task<IActionResult> Put(string version, Guid id, string textToMatch)
-        {
-            var request = new ProcessMessageRequest(id, textToMatch);
-            var response = await mediator.Send(request);
-            logger.LogInformation("Processed Put {version} with result '{description}'.", version, response.Description);
-            return MessageProcessResponse((dynamic)response);
-        }
+    private IActionResult MessageByIdResponse(MessageByIdNotFoundResponse response)
+    {
+        return NotFound();
+    }
 
-        private MessageDto ToDto(Message message)
-            => new MessageDto { id = message.Id, text = message.Text };
+    private IActionResult MessageByIdResponse(GetMessageByIdResponse response)
+    {
+        return Ok(ToDto(response.Message));
+    }
 
-        private IActionResult MessageByIdResponse(MessageByIdNotFoundResponse response)
-        {
-            return NotFound();
-        }
+    private IActionResult CreateMessageResponse(CreateMessageSuccessResponse success)
+    {
+        logger.LogInformation("Created message with id={id} and text={text}", success.Message.Id, success.Message.Text);
+        return Ok(success.Message.Id);
+    }
 
-        private IActionResult MessageByIdResponse(GetMessageByIdResponse response)
-        {
-            return Ok(ToDto(response.Message));
-        }
+    private IActionResult CreateMessageResponse(CreateMessageResponse response)
+    {
+        logger.LogInformation("Error creating message: {description}", response.Description);
+        return BadRequest(response.Description);
+    }
 
-        private IActionResult CreateMessageResponse(CreateMessageSuccessResponse success)
-        {
-            logger.LogInformation("Created message with id={id} and text={text}", success.Message.Id, success.Message.Text);
-            return Ok(success.Message.Id);
-        }
+    private IActionResult MessageProcessResponse(MessageToProcessNotFoundResponse response)
+    {
+        return NotFound();
+    }
 
-        private IActionResult CreateMessageResponse(CreateMessageResponse response)
-        {
-            logger.LogInformation("Error creating message: {description}", response.Description);
-            return BadRequest(response.Description);
-        }
+    private IActionResult MessageProcessResponse(ErrorProcessingMessageResponse error)
+    {
+        return BadRequest(error.Description);
+    }
 
-        private IActionResult MessageProcessResponse(MessageToProcessNotFoundResponse response)
-        {
-            return NotFound();
-        }
-
-        private IActionResult MessageProcessResponse(ErrorProcessingMessageResponse error)
-        {
-            return BadRequest(error.Description);
-        }
-
-        private IActionResult MessageProcessResponse(ProcessMessageResponse response)
-        {
-            return Ok();
-        }
+    private IActionResult MessageProcessResponse(ProcessMessageResponse response)
+    {
+        return Ok();
     }
 }

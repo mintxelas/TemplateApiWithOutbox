@@ -2,12 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Sample.Infrastructure.Entities;
 
-namespace Sample.Infrastructure.EntityFramework
+namespace Sample.Infrastructure.EntityFramework;
+
+public interface IOutboxDbContext
 {
-    public interface IOutboxDbContext
-    {
-        DbSet<OutboxEvent> OutboxEvents { get; set; }
-        int SaveChanges();
-        Task<int> SaveChangesAsync();
-    }
+    DbSet<OutboxEvent> OutboxEvents { get; set; }
+    int SaveChanges();
+    Task<int> SaveChangesAsync();
 }

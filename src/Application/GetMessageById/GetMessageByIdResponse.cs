@@ -1,22 +1,10 @@
 ﻿using Sample.Domain;
 
-namespace Sample.Application.GetMessageById
+namespace Sample.Application.GetMessageById;
+
+public class GetMessageByIdResponse(Message message)
 {
-    public class GetMessageByIdResponse
-    {
-        public Message Message { get; }
-
-        public GetMessageByIdResponse(Message message)
-        {
-            Message = message;
-        }
-    }
-
-    public class MessageByIdNotFoundResponse : GetMessageByIdResponse
-    {
-        public MessageByIdNotFoundResponse(): base(null)
-        {
-            
-        }
-    }
+    public Message Message { get; } = message;
 }
+
+public class MessageByIdNotFoundResponse() : GetMessageByIdResponse(null);

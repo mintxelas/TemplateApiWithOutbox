@@ -4,25 +4,18 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Sample.Infrastructure.Configuration;
 
-namespace Sample.Api.Middleware
+namespace Sample.Api.Middleware;
+
+public class ValidateConfigurationStartupFilter(IEnumerable<IValidateConfiguration> configurationObjects)
+    : IStartupFilter
 {
-    public class ValidateConfigurationStartupFilter : IStartupFilter
+    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
     {
-        private readonly IEnumerable<IValidateConfiguration> configurationObjects;
-
-        public ValidateConfigurationStartupFilter(IEnumerable<IValidateConfiguration> configurationObjects)
+        foreach (var configuration in configurationObjects)
         {
-            this.configurationObjects = configurationObjects;
+            configuration.Validate();
         }
 
-        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
-        {
-            foreach (var configuration in configurationObjects)
-            {
-                configuration.Validate();
-            }
-
-            return next;
-        }
+        return next;
     }
 }

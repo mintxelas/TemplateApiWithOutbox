@@ -1,7 +1,6 @@
-﻿namespace Sample.Application.Subscriptions
+﻿namespace Sample.Application.Subscriptions;
+
+public interface ISubscribeToContextEvents
 {
-    public interface ISubscribeToContextEvents
-    {
-        void InitializeSubscriptions();
-    }
+    void InitializeSubscriptions();
 }

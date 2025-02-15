@@ -2,25 +2,20 @@
 using Microsoft.EntityFrameworkCore;
 using Sample.Infrastructure.Entities;
 
-namespace Sample.Infrastructure.EntityFramework
+namespace Sample.Infrastructure.EntityFramework;
+
+public class OutboxConsumerDbContext(DbContextOptions<OutboxConsumerDbContext> options)
+    : DbContext(options), IOutboxDbContext
 {
-    public class OutboxConsumerDbContext : DbContext, IOutboxDbContext
+    public DbSet<OutboxEvent> OutboxEvents { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        public DbSet<OutboxEvent> OutboxEvents { get; set; }
+        modelBuilder.Entity<OutboxEvent>().HasKey(oe => oe.Id); 
+    }
 
-        public OutboxConsumerDbContext(DbContextOptions<OutboxConsumerDbContext> options) : base(options)
-        {
-
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<OutboxEvent>().HasKey(oe => oe.Id); 
-        }
-
-        public Task<int> SaveChangesAsync()
-        {
-            return base.SaveChangesAsync();
-        }
+    public Task<int> SaveChangesAsync()
+    {
+        return base.SaveChangesAsync();
     }
 }

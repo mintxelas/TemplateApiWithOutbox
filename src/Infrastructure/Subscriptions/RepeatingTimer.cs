@@ -2,60 +2,59 @@
 using System.Threading;
 using Sample.Infrastructure.Configuration;
 
-namespace Sample.Infrastructure.Subscriptions
+namespace Sample.Infrastructure.Subscriptions;
+
+public sealed class RepeatingTimer: IDisposable
 {
-    public sealed class RepeatingTimer: IDisposable
+    private readonly Timer timer;
+
+    private bool processing;
+    private bool Processing
     {
-        private readonly Timer timer;
-
-        private bool processing;
-        private bool Processing
+        get
         {
-            get
+            lock (timer)
             {
-                lock (timer)
-                {
-                    return processing;
-                }
-            }
-
-            set
-            {
-                lock (timer)
-                {
-                    processing = value;
-                }
+                return processing;
             }
         }
 
-        public Action OnTick { get; set; }
-
-        public RepeatingTimer(TimerConfiguration configuration)
+        set
         {
-            var due = configuration.DueSeconds > 0 ? configuration.DueSeconds * 1000 : configuration.DueSeconds;
-            var period = configuration.PeriodSeconds > 0 ? configuration.PeriodSeconds * 1000 : configuration.PeriodSeconds;
-            timer = new Timer(Tick, null, due, period);
-        }
-
-        private void Tick(object state)
-        {
-            if (!Processing)
+            lock (timer)
             {
-                try
-                {
-                    Processing = true;
-                    OnTick?.Invoke();
-                }
-                finally
-                {
-                    Processing = false;
-                }
+                processing = value;
             }
         }
+    }
 
-        public void Dispose()
+    public Action OnTick { get; set; }
+
+    public RepeatingTimer(TimerConfiguration configuration)
+    {
+        var due = configuration.DueSeconds > 0 ? configuration.DueSeconds * 1000 : configuration.DueSeconds;
+        var period = configuration.PeriodSeconds > 0 ? configuration.PeriodSeconds * 1000 : configuration.PeriodSeconds;
+        timer = new Timer(Tick, null, due, period);
+    }
+
+    private void Tick(object state)
+    {
+        if (!Processing)
         {
-            timer?.Dispose();
+            try
+            {
+                Processing = true;
+                OnTick?.Invoke();
+            }
+            finally
+            {
+                Processing = false;
+            }
         }
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
     }
 }

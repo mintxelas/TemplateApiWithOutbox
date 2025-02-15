@@ -5,35 +5,31 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Sample.Application.Behaviors
+namespace Sample.Application.Behaviors;
+
+public class LoggingPipelineBehavior<TRequest, TResponse>(ILogger<LoggingPipelineBehavior<TRequest, TResponse>> logger)
+    : IPipelineBehavior<TRequest, TResponse>
 {
-    public class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    private readonly ILogger logger = logger;
+
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
-        private readonly ILogger _logger;
-
-        public LoggingPipelineBehavior(ILogger<LoggingPipelineBehavior<TRequest, TResponse>> logger)
+        logger.LogInformation("Handling {@Request}", request);
+        var stopWatch = Stopwatch.StartNew();
+        try
         {
-            _logger = logger;
+            var response = await next();
+            stopWatch.Stop();
+            logger.LogInformation(
+                "Handled {RequestType}: {@Response} in {Duration}ms", typeof(TRequest).Name, response, stopWatch.ElapsedMilliseconds);
+            return response;
         }
-
-        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+        catch (Exception ex)
         {
-            _logger.LogInformation($"Handling {{@Request}}", request);
-            var stopWatch = Stopwatch.StartNew();
-            try
-            {
-                var response = await next();
-                stopWatch.Stop();
-                _logger.LogInformation(
-                    $"Handled {typeof(TRequest).Name}: {{@Response}} in {stopWatch.ElapsedMilliseconds}ms", response);
-                return response;
-            }
-            catch (Exception ex)
-            {
-                stopWatch.Stop();
-                _logger.LogInformation($"Request {typeof(TRequest).Name} threw exception: {{@Exception}} in {stopWatch.ElapsedMilliseconds}ms", ex);
-                throw;
-            }
+            stopWatch.Stop();
+            logger.LogInformation(
+                "Request {RequestType} threw exception: {@Exception} in {Duration}ms", typeof(TRequest).Name, ex, stopWatch.ElapsedMilliseconds);
+            throw;
         }
     }
 }

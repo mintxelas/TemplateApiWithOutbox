@@ -4,32 +4,24 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace Sample.Api.Middleware
+namespace Sample.Api.Middleware;
+
+public class LogContextMiddleware(RequestDelegate next, ILogger<LogContextMiddleware> logger)
 {
-    public class LogContextMiddleware
+    public Task InvokeAsync(HttpContext context)
     {
-        private readonly RequestDelegate next;
-        private readonly ILogger<LogContextMiddleware> logger;
+        if (Activity.Current == null) return next(context);
+        
+        var correlationHeaders = Activity.Current
+            .Baggage
+            .Distinct()
+            .ToDictionary(
+                b => b.Key, 
+                b => b.Value);
 
-        public LogContextMiddleware(RequestDelegate next, ILogger<LogContextMiddleware> logger)
+        using (logger.BeginScope(correlationHeaders))
         {
-            this.next = next;
-            this.logger = logger;
-        }
-
-        public Task InvokeAsync(HttpContext context)
-        {
-            var correlationHeaders = Activity.Current
-                .Baggage
-                .Distinct()
-                .ToDictionary(
-                    b => b.Key, 
-                    b => b.Value);
-
-            using (logger.BeginScope(correlationHeaders))
-            {
-                return next(context);
-            }
+            return next(context);
         }
     }
 }

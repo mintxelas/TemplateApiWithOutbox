@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using Sample.Domain;
 
-namespace Sample.Infrastructure.Repositories
+namespace Sample.Infrastructure.Repositories;
+
+public interface IOutboxRepository
 {
-    public interface IOutboxRepository
-    {
-        IEnumerable<DomainEvent> PendingEvents();
-    }
+    IEnumerable<IDomainEvent> PendingEvents();
 }
