@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Template.Infrastructure.Entities;
+using Sample.Infrastructure.Entities;
 
-namespace Template.Infrastructure.EntityFramework
+namespace Sample.Infrastructure.EntityFramework
 {
     public class MessageDbContext: DbContext
     {

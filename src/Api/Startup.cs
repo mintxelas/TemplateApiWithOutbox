@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Template.Api.HealthChecks;
-using Template.Api.Middleware;
-using Template.Infrastructure.EntityFramework;
+using Sample.Api.HealthChecks;
+using Sample.Api.Middleware;
+using Sample.Infrastructure.EntityFramework;
 
-namespace Template.Api
+namespace Sample.Api
 {
     public class Startup
     {
@@ -23,7 +23,7 @@ namespace Template.Api
             services.AddControllers();
             services.AddMediatorWithBehaviors();
             services.AddVersionedApi(defaultApiVersion: 1);
-            services.AddSwaggerWithVersions("Template Api", 1, 2);
+            services.AddSwaggerWithVersions("Sample Api", 1, 2);
             services.AddCustomConfiguration(configuration.GetSection("OutBox"));
             services.AddConfigurationValidation();
             services.AddOutboxSupport();

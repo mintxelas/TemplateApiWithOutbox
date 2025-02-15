@@ -3,11 +3,11 @@ using NSubstitute.ExceptionExtensions;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Template.Application.ProcessMessage;
-using Template.Domain;
+using Sample.Application.ProcessMessage;
+using Sample.Domain;
 using Xunit;
 
-namespace Template.Application.Tests
+namespace Sample.Application.Tests
 {
     public class ProcessMessageHandlerShould
     {

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
 
-namespace Template.Application.Behaviors
+namespace Sample.Application.Behaviors
 {
     public class ValidatorPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     {
@@ -16,7 +16,7 @@ namespace Template.Application.Behaviors
             this.validators = validators;
         }
 
-        public Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             var failures = validators
                 .Select(validator => validator.Validate(request))

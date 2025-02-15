@@ -2,9 +2,9 @@
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
-using Template.Domain;
+using Sample.Domain;
 
-namespace Template.Application.ProcessMessage
+namespace Sample.Application.ProcessMessage
 {
     public class ProcessMessageHandler : IRequestHandler<ProcessMessageRequest, ProcessMessageResponse>
     {

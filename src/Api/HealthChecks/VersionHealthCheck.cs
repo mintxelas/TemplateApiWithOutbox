@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Linq;
+using System.Text.Json;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using System.Linq;
-using System.Text.Json;
 
-namespace Template.Api.HealthChecks
+namespace Sample.Api.HealthChecks
 {
     public static class VersionHealthCheckExtension
     {

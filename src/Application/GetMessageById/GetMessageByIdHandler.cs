@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
-using Template.Domain;
+using Sample.Domain;
 
-namespace Template.Application.GetMessageById
+namespace Sample.Application.GetMessageById
 {
     public class GetMessageByIdHandler : IRequestHandler<GetMessageByIdRequest, GetMessageByIdResponse>
     {

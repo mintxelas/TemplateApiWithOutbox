@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using Xunit;
 
-namespace Template.Domain.Tests
+namespace Sample.Domain.Tests
 {
     public class MessageShould
     {

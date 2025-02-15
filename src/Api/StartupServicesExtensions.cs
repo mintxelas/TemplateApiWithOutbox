@@ -1,23 +1,24 @@
-﻿using FluentValidation;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using System.Collections.Generic;
-using System.Linq;
-using Template.Api.Middleware;
-using Template.Application;
-using Template.Application.Subscriptions;
-using Template.Domain;
-using Template.Infrastructure.Configuration;
-using Template.Infrastructure.EntityFramework;
-using Template.Infrastructure.Repositories;
-using Template.Infrastructure.Subscriptions;
+using Sample.Api.Middleware;
+using Sample.Application;
+using Sample.Application.Subscriptions;
+using Sample.Domain;
+using Sample.Infrastructure.Configuration;
+using Sample.Infrastructure.EntityFramework;
+using Sample.Infrastructure.Repositories;
+using Sample.Infrastructure.Subscriptions;
 
-namespace Template.Api
+namespace Sample.Api
 {
     public static class StartupServicesExtensions
     {
@@ -25,19 +26,15 @@ namespace Template.Api
         {
             services.AddApiVersioning(options =>
             {
+                options.UnsupportedApiVersionStatusCode = 501;
                 options.ReportApiVersions = true;
-                options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(defaultApiVersion, 0);
+                options.DefaultApiVersion = new ApiVersion(defaultApiVersion, 0);
                 options.AssumeDefaultVersionWhenUnspecified = true;
                 options.ApiVersionReader = ApiVersionReader.Combine(
                     new HeaderApiVersionReader("X-version"),
                     new QueryStringApiVersionReader("api-version"));
-            });
-
-            services.AddVersionedApiExplorer(options =>
-            {
-                options.GroupNameFormat = "'v'VVV";
-            });
-
+            }).AddApiExplorer(options => options.GroupNameFormat = "'v'VVV");
+            
             return services;
         }
 
@@ -96,7 +93,7 @@ namespace Template.Api
 
         public static IServiceCollection AddMediatorWithBehaviors(this IServiceCollection services)
         {
-            services.AddMediatR(typeof(Placeholder).Assembly);
+            services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(Placeholder).Assembly));
             services.Scan(scan => scan
                 .FromAssemblyOf<Application.Placeholder>()
                 .AddClasses(@class => @class.AssignableTo(typeof(IPipelineBehavior<,>)))
@@ -112,11 +109,10 @@ namespace Template.Api
         {
             services.AddTransient<IStartupFilter, ValidateConfigurationStartupFilter>();
             services.AddSingleton<IEnumerable<IValidateConfiguration>>(serviceProvider =>
-                new IValidateConfiguration[]
-                {
-                    serviceProvider.GetRequiredService<OutBoxConfiguration>(),
-                    serviceProvider.GetRequiredService<TimerConfiguration>()
-                });
+            [
+                serviceProvider.GetRequiredService<OutBoxConfiguration>(),
+                serviceProvider.GetRequiredService<TimerConfiguration>()
+            ]);
         }
     }
 }

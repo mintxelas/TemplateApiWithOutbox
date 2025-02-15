@@ -2,13 +2,13 @@
 using System.Linq;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using Template.Domain;
-using Template.Infrastructure.Entities;
-using Template.Infrastructure.EntityFramework;
-using Template.Infrastructure.Repositories;
+using Sample.Domain;
+using Sample.Infrastructure.Entities;
+using Sample.Infrastructure.EntityFramework;
+using Sample.Infrastructure.Repositories;
 using Xunit;
 
-namespace Template.Infrastructure.Tests
+namespace Sample.Infrastructure.Tests
 {
     public sealed class OutboxRepositoryShould: IDisposable
     {

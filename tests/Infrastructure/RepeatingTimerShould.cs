@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Threading;
-using Template.Infrastructure.Configuration;
-using Template.Infrastructure.Subscriptions;
+using Sample.Infrastructure.Configuration;
+using Sample.Infrastructure.Subscriptions;
 using Xunit;
 
-namespace Template.Infrastructure.Tests
+namespace Sample.Infrastructure.Tests
 {
     public class RepeatingTimerShould
     {

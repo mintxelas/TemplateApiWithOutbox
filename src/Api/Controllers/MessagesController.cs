@@ -1,17 +1,18 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Template.Api.Models;
-using Template.Application.CreateMessage;
-using Template.Application.GetAllMessages;
-using Template.Application.GetMessageById;
-using Template.Application.ProcessMessage;
-using Template.Domain;
+using Asp.Versioning;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Sample.Api.Models;
+using Sample.Application.CreateMessage;
+using Sample.Application.GetAllMessages;
+using Sample.Application.GetMessageById;
+using Sample.Application.ProcessMessage;
+using Sample.Domain;
 
-namespace Template.Api.Controllers
+namespace Sample.Api.Controllers
 {
     [ApiVersion("1.0")]
     [ApiVersion("2.0")]

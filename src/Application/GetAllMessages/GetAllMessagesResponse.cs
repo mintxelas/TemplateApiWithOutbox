@@ -1,6 +1,6 @@
-﻿using Template.Domain;
+﻿using Sample.Domain;
 
-namespace Template.Application.GetAllMessages
+namespace Sample.Application.GetAllMessages
 {
     public class GetAllMessagesResponse
     {

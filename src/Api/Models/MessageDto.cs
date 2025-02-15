@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Template.Api.Models
+namespace Sample.Api.Models
 {
     public class MessageDto
     {

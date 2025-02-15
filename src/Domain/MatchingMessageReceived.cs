@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Template.Domain
+namespace Sample.Domain
 {
     public class MatchingMessageReceived : DomainEvent
     {

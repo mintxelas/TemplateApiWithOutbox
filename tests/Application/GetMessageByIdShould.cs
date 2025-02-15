@@ -3,12 +3,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
-using Template.Application.GetAllMessages;
-using Template.Application.GetMessageById;
-using Template.Domain;
+using Sample.Application.GetAllMessages;
+using Sample.Application.GetMessageById;
+using Sample.Domain;
 using Xunit;
 
-namespace Template.Application.Tests
+namespace Sample.Application.Tests
 {
     public class GetMessageByIdShould
     {

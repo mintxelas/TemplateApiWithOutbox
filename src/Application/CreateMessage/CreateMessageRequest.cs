@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Template.Application.CreateMessage
+namespace Sample.Application.CreateMessage
 {
     public class CreateMessageRequest: IRequest<CreateMessageResponse>
     {

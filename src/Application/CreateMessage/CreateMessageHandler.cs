@@ -2,9 +2,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Template.Domain;
+using Sample.Domain;
 
-namespace Template.Application.CreateMessage
+namespace Sample.Application.CreateMessage
 {
     public class CreateMessageHandler : IRequestHandler<CreateMessageRequest, CreateMessageResponse>
     {

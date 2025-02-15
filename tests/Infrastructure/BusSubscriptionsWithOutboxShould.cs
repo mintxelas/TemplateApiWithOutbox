@@ -1,13 +1,13 @@
 using System;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using Template.Domain;
-using Template.Infrastructure.Configuration;
-using Template.Infrastructure.Repositories;
-using Template.Infrastructure.Subscriptions;
+using Sample.Domain;
+using Sample.Infrastructure.Configuration;
+using Sample.Infrastructure.Repositories;
+using Sample.Infrastructure.Subscriptions;
 using Xunit;
 
-namespace Template.Infrastructure.Tests
+namespace Sample.Infrastructure.Tests
 {
     public class BusSubscriptionsWithOutboxShould
     {

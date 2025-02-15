@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Template.Infrastructure.Entities
+namespace Sample.Infrastructure.Entities
 {
     public class MessageRecord
     {

@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
+﻿using System.Collections.Generic;
+using Asp.Versioning.ApiExplorer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
-using Template.Application.Subscriptions;
+using Sample.Application.Subscriptions;
 
-namespace Template.Api
+namespace Sample.Api
 {
     public static class StartupAppExtensions
     {

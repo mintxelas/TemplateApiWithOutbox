@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Template.Domain;
+using Sample.Domain;
 
-namespace Template.Infrastructure.Repositories
+namespace Sample.Infrastructure.Repositories
 {
     public interface IOutboxRepository
     {

@@ -1,4 +1,4 @@
-﻿namespace Template.Application
+﻿namespace Sample.Application
 {
     public sealed class Placeholder
     {

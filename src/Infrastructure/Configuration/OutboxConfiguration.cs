@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Template.Infrastructure.Configuration
+namespace Sample.Infrastructure.Configuration
 {
     public class OutBoxConfiguration : IValidateConfiguration
     {

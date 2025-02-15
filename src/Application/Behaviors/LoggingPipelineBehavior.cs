@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Template.Application.Behaviors
+namespace Sample.Application.Behaviors
 {
     public class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     {
@@ -16,7 +16,7 @@ namespace Template.Application.Behaviors
             _logger = logger;
         }
 
-        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Handling {{@Request}}", request);
             var stopWatch = Stopwatch.StartNew();

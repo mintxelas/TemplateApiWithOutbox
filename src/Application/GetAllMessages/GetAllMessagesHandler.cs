@@ -2,9 +2,9 @@
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
-using Template.Domain;
+using Sample.Domain;
 
-namespace Template.Application.GetAllMessages
+namespace Sample.Application.GetAllMessages
 {
     public class GetAllMessagesHandler : IRequestHandler<GetAllMessagesRequest, GetAllMessagesResponse>
     {

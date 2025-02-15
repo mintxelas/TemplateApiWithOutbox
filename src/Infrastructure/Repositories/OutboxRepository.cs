@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using Template.Domain;
-using Template.Infrastructure.Entities;
-using Template.Infrastructure.EntityFramework;
+using Sample.Domain;
+using Sample.Infrastructure.Entities;
+using Sample.Infrastructure.EntityFramework;
 
-namespace Template.Infrastructure.Repositories
+namespace Sample.Infrastructure.Repositories
 {
     public class OutboxRepository : IOutboxRepository
     {

@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using System;
 
-namespace Template.Application.ProcessMessage
+namespace Sample.Application.ProcessMessage
 {
     public class ProcessMessageRequest: IRequest<ProcessMessageResponse>
     {

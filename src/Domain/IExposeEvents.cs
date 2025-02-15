@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Template.Domain
+namespace Sample.Domain
 {
     public interface IExposeEvents
     {

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Template.Application.CreateMessage
+namespace Sample.Application.CreateMessage
 {
     public class CreateMessageValidator : AbstractValidator<CreateMessageRequest>
     {

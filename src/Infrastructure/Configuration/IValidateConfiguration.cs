@@ -1,4 +1,4 @@
-﻿namespace Template.Infrastructure.Configuration
+﻿namespace Sample.Infrastructure.Configuration
 {
     public interface IValidateConfiguration
     {

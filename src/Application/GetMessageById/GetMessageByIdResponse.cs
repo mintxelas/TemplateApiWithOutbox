@@ -1,6 +1,6 @@
-﻿using Template.Domain;
+﻿using Sample.Domain;
 
-namespace Template.Application.GetMessageById
+namespace Sample.Application.GetMessageById
 {
     public class GetMessageByIdResponse
     {

@@ -3,11 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
-using Template.Application.CreateMessage;
-using Template.Domain;
+using Sample.Application.CreateMessage;
+using Sample.Domain;
 using Xunit;
 
-namespace Template.Application.Tests
+namespace Sample.Application.Tests
 {
     public class CreateMessageHandlerShould
     {

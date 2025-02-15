@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Template.Infrastructure.Configuration;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Sample.Infrastructure.Configuration;
 
-namespace Template.Api.Middleware
+namespace Sample.Api.Middleware
 {
     public class ValidateConfigurationStartupFilter : IStartupFilter
     {

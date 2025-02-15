@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Template.Application.GetAllMessages
+namespace Sample.Application.GetAllMessages
 {
     public class GetAllMessagesRequest : IRequest<GetAllMessagesResponse>
     {

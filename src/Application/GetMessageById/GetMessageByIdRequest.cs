@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using System;
 
-namespace Template.Application.GetMessageById
+namespace Sample.Application.GetMessageById
 {
     public class GetMessageByIdRequest : IRequest<GetMessageByIdResponse>
     {

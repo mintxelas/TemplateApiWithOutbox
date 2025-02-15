@@ -1,6 +1,6 @@
-﻿using Template.Domain;
+﻿using Sample.Domain;
 
-namespace Template.Application.CreateMessage
+namespace Sample.Application.CreateMessage
 {
     public class CreateMessageResponse
     {

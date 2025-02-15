@@ -2,10 +2,10 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Template.Domain;
-using Template.Infrastructure.Repositories;
+using Sample.Domain;
+using Sample.Infrastructure.Repositories;
 
-namespace Template.Infrastructure.Subscriptions
+namespace Sample.Infrastructure.Subscriptions
 {
     public sealed class BusSubscriptionsWithOutbox : IEventReader
     {

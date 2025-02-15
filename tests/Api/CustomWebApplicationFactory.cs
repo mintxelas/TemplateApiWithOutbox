@@ -6,12 +6,12 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
 using System.Linq;
-using Template.Application.CreateMessage;
-using Template.Application.GetAllMessages;
-using Template.Application.GetMessageById;
-using Template.Application.ProcessMessage;
+using Sample.Application.CreateMessage;
+using Sample.Application.GetAllMessages;
+using Sample.Application.GetMessageById;
+using Sample.Application.ProcessMessage;
 
-namespace Template.Api.Tests
+namespace Sample.Api.Tests
 {
     public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
     {

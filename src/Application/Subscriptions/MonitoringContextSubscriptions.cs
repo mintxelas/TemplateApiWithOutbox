@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using Template.Domain;
+using Sample.Domain;
 
-namespace Template.Application.Subscriptions
+namespace Sample.Application.Subscriptions
 {
     public class MonitoringContextSubscriptions: ISubscribeToContextEvents
     {

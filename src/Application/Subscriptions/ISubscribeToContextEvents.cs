@@ -1,4 +1,4 @@
-﻿namespace Template.Application.Subscriptions
+﻿namespace Sample.Application.Subscriptions
 {
     public interface ISubscribeToContextEvents
     {

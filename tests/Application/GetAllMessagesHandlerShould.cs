@@ -2,11 +2,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 using NSubstitute;
-using Template.Application.GetAllMessages;
-using Template.Domain;
+using Sample.Application.GetAllMessages;
+using Sample.Domain;
 using Xunit;
 
-namespace Template.Application.Tests
+namespace Sample.Application.Tests
 {
     public class GetAllMessagesHandlerShould
     {

@@ -1,4 +1,4 @@
-﻿namespace Template.Application.ProcessMessage
+﻿namespace Sample.Application.ProcessMessage
 {
     public class ProcessMessageResponse
     {
