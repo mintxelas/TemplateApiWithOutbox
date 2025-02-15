@@ -52,7 +52,7 @@ public class MessagesControllerShould : IClassFixture<CustomWebApplicationFactor
 
         response.EnsureSuccessStatusCode();
         var responseString = await response.Content.ReadAsStringAsync();
-        var actualMessages = JsonSerializer.Deserialize<MessageDto[]>(responseString);
+        var actualMessages = JsonSerializer.Deserialize<MessageDto[]>(responseString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         Assert.Contains(expectedMessage.Id, actualMessages.Select(m => m.Id));
     }
 
@@ -68,7 +68,7 @@ public class MessagesControllerShould : IClassFixture<CustomWebApplicationFactor
 
         response.EnsureSuccessStatusCode();
         var responseString = await response.Content.ReadAsStringAsync();
-        var actualMessage = JsonSerializer.Deserialize<MessageDto>(responseString);
+        var actualMessage = JsonSerializer.Deserialize<MessageDto>(responseString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         Assert.Equal(expectedMessage.Id, actualMessage.Id);
         Assert.Equal(expectedMessage.Text, actualMessage.Text);
     }
