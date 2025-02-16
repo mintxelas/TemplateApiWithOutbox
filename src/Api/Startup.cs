@@ -1,3 +1,5 @@
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -9,10 +11,19 @@ using Sample.Infrastructure.EntityFramework;
 
 namespace Sample.Api;
 
-public class Startup(IConfiguration configuration)
+public class Startup(IConfiguration configuration, IWebHostEnvironment environment)
 {
     public void ConfigureServices(IServiceCollection services)
     {
+        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+        services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.Authority = "https://localhost:5100";
+                options.Audience = "internal-api";
+                options.IncludeErrorDetails = environment.IsDevelopment();
+            });
         services.AddControllers();
         services.AddMediatorWithBehaviors();
         services.AddVersionedApi(defaultApiVersion: 1);
@@ -22,7 +33,13 @@ public class Startup(IConfiguration configuration)
         services.AddOutboxSupport();
         services.AddSubscriptions();
         services.AddHealthChecks()
-            .AddDbContextCheck<MessageDbContext>();
+            .AddDbContextCheck<MessageDbContext>()
+            .AddSelfCheck();
+        services.AddOpenTelemetryConfiguration(configuration);
+        services.ConfigureHttpClientDefaults(http =>
+        {
+            http.AddStandardResilienceHandler();
+        });
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, MessageDbContext dbContext)
@@ -36,11 +53,13 @@ public class Startup(IConfiguration configuration)
 
         app.UseSwaggerWithVersions();
         app.UseRouting();
+        app.UseAuthentication();
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapControllers();
+            endpoints.MapControllers().RequireAuthorization();
             endpoints.MapHealthCheckWithVersion("/health");
+            endpoints.MapLivenessProbe("/alive");
         });
 
         app.UseSubscriptions();

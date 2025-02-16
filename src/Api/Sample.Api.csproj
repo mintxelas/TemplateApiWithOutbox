@@ -10,8 +10,16 @@
 
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.2" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="9.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.2.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.11.1" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.11.1" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.11.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.11.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.11.0" />
     <PackageReference Include="Scrutor" Version="6.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
   </ItemGroup>

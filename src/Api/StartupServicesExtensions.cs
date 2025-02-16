@@ -1,13 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Asp.Versioning;
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 using Sample.Api.Middleware;
 using Sample.Application.Subscriptions;
 using Sample.Domain;
@@ -111,5 +116,39 @@ public static class StartupServicesExtensions
             serviceProvider.GetRequiredService<OutBoxConfiguration>(),
             serviceProvider.GetRequiredService<TimerConfiguration>()
         ]);
+    }
+
+    public static void AddOpenTelemetryConfiguration(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddLogging(builder => builder.AddOpenTelemetry(logging =>
+        {
+            logging.IncludeScopes = true;
+            logging.IncludeFormattedMessage = true;
+        }));
+        
+        services.AddOpenTelemetry()
+            .WithMetrics(metrics =>
+            {
+                metrics.AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddRuntimeInstrumentation();
+            })
+            .WithTracing(tracing =>
+            {
+                tracing.AddAspNetCoreInstrumentation()
+                    // Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
+                    //.AddGrpcClientInstrumentation()
+                    .AddHttpClientInstrumentation();
+            });
+        
+        if (!string.IsNullOrWhiteSpace(configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]))
+        {
+            services.AddOpenTelemetry().UseOtlpExporter();
+        }
+        
+        if (!string.IsNullOrEmpty(configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
+        {
+            services.AddOpenTelemetry().UseAzureMonitor();
+        }
     }
 }

@@ -5,10 +5,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Sample.Api.HealthChecks;
 
-public static class VersionHealthCheckExtension
+public static class CustomHealthCheckExtensions
 {
     public static IEndpointConventionBuilder MapHealthCheckWithVersion(this IEndpointRouteBuilder endpoints,
         string pattern)
@@ -40,6 +42,19 @@ public static class VersionHealthCheckExtension
                     }, jsonSerializerOptions);
                 await context.Response.WriteAsync(result);
             }
+        });
+    }
+
+    public static IHealthChecksBuilder AddSelfCheck(this IHealthChecksBuilder builder)
+    {
+        return builder.AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
+    }
+    
+    public static IEndpointConventionBuilder MapLivenessProbe(this IEndpointRouteBuilder endpoints, string pattern)
+    {
+        return endpoints.MapHealthChecks(pattern, new HealthCheckOptions
+        {
+            Predicate = registration => registration.Tags.Contains("live")
         });
     }
 }
