@@ -27,7 +27,7 @@ public sealed class OutboxRepositoryShould: IDisposable
     {
         var givenEvent = GivenEvent();
         var actualEvents = repository.PendingEvents();
-        Assert.Single(actualEvents.Where(e => e.Equals(givenEvent)));
+        Assert.Single(actualEvents, e => e.Equals(givenEvent));
     }
 
     [Fact]
@@ -78,14 +78,23 @@ public sealed class OutboxRepositoryShould: IDisposable
 
     private class MockEvent : IDomainEvent
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; init; }
 
         public override bool Equals(object obj)
         {
-            if (obj is null) return false;
             if (obj is MockEvent other)
                 return other.Id == Id;
             return false;
+        }
+
+        protected bool Equals(MockEvent other)
+        {
+            return Id.Equals(other.Id);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
         }
     }
 }

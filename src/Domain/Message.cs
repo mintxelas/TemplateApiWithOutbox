@@ -35,4 +35,14 @@ public class Message(Guid id, string text) : IExposeEvents
         if (obj is Message other) return Id == other.Id && Text == other.Text;
         return false;
     }
+
+    protected bool Equals(Message other)
+    {
+        return Id.Equals(other.Id) && Text == other.Text;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Id, Text);
+    }
 }
