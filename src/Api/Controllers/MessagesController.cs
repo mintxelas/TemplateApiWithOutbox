@@ -31,7 +31,7 @@ public class MessagesController(IMessageRepository repository, IMediator mediato
         return Ok(response.Messages.Select(ToDto));
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     public async Task<ActionResult<MessageDto>> Get([FromRoute] Guid id)
     {
         var request = new GetMessageByIdRequest(id);
@@ -48,11 +48,11 @@ public class MessagesController(IMessageRepository repository, IMediator mediato
     }
 
     [MapToApiVersion("1.0")]
-    [HttpPut("process/{id}")]
+    [HttpPut("process/{id:guid}")]
     public Task<IActionResult> PutV1([FromRoute] Guid id) => Put("v1", id, "Hello");
 
     [MapToApiVersion("2.0")]
-    [HttpPut("process/{id}")]
+    [HttpPut("process/{id:guid}")]
     public Task<IActionResult> PutV2([FromRoute] Guid id) => Put("v2", id, "World");
 
     private async Task<IActionResult> Put(string version, Guid id, string textToMatch)
