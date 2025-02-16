@@ -6,5 +6,13 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p><a href="/api/messages">Get all messages</a></p>
+    <p><a href="https://localhost:5300/swagger">Backend API docs</a></p>
+    <p>User password: alice/alice<br/><a href="/api/messages">Get all messages</a></p>
+    <p>
+        Create a new message:<br/>
+        <form action="/api/messages" method="POST">
+            <label for="text">Text:</label><input type="text" name="text" placeholder="Enter a new message"/>
+            <input type="submit" value="Submit"/>
+        </form>
+    </p>
 </div>
