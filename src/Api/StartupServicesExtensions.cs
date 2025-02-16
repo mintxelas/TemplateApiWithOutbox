@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -48,8 +49,30 @@ public static class StartupServicesExtensions
         {
             foreach (var version in Enumerable.Range(minVersion, (maxVersion - minVersion + 1)))
             {
-                options.SwaggerDoc($"v{version}", new Microsoft.OpenApi.Models.OpenApiInfo { Title = apiDescription, Version = $"v{version}" });
+                options.SwaggerDoc($"v{version}", new OpenApiInfo { Title = apiDescription, Version = $"v{version}" });
             }
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Please enter a valid token",
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                BearerFormat = "JWT",
+                Scheme = "Bearer"
+            });
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type=ReferenceType.SecurityScheme,
+                            Id="Bearer"
+                        }
+                    }, []
+                }
+            });
         });
     }
 
