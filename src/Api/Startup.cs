@@ -13,6 +13,9 @@ namespace Sample.Api;
 
 public class Startup(IConfiguration configuration, IWebHostEnvironment environment)
 {
+    private const int MinimumApiVersion = 1;
+    private const int MaximumApiVersion = 2;
+    
     public void ConfigureServices(IServiceCollection services)
     {
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -26,8 +29,8 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
             });
         services.AddControllers();
         services.AddMediatorWithBehaviors();
-        services.AddVersionedApi(defaultApiVersion: 1);
-        services.AddSwaggerWithVersions("Sample Api", 1, 2);
+        services.AddVersionedApi(defaultApiVersion: MaximumApiVersion);
+        services.AddSwaggerWithVersions("Sample Api", MinimumApiVersion, MaximumApiVersion);
         services.AddCustomConfiguration(configuration.GetSection("OutBox"));
         services.AddConfigurationValidation();
         services.AddOutboxSupport();
@@ -57,7 +60,7 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapControllers().RequireAuthorization();
+            endpoints.MapControllers();
             endpoints.MapHealthCheckWithVersion("/health");
             endpoints.MapLivenessProbe("/alive");
         });

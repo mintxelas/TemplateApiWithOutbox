@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Asp.Versioning;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Sample.Api.Models;
@@ -40,6 +41,7 @@ public class MessagesController(IMessageRepository repository, IMediator mediato
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<Guid>> Post([FromForm] string text)
     {
         var request = new CreateMessageRequest(text);
