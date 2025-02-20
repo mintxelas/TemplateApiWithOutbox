@@ -6,6 +6,16 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
+using System.Security.Principal;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Sample.Application.CreateMessage;
 using Sample.Application.GetAllMessages;
 using Sample.Application.GetMessageById;
@@ -31,7 +41,6 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
         {
             configurationBuilder.AddJsonFile(configPath);
         });
-        var inMemoryContextName = Guid.NewGuid().ToString();
         builder.ConfigureServices(services =>
         {
             var getAllMessagesDescriptor = services.SingleOrDefault(s =>
@@ -53,6 +62,26 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
                 s.ServiceType == typeof(IRequestHandler<ProcessMessageRequest, ProcessMessageResponse>));
             services.Remove(processMessageDescriptor);
             services.AddScoped(_ => ProcessMessageHandler);
+
+            services.AddAuthentication(options => options.DefaultScheme = "Test")
+                .AddScheme<AuthenticationSchemeOptions, TestAuthenticationHandler>("Test", options => options.ForwardDefault = "Test");
         });
     }
+}
+
+public class TestAuthenticationHandler(
+    IOptionsMonitor<AuthenticationSchemeOptions> options,
+    ILoggerFactory logger,
+    UrlEncoder encoder)
+    : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
+{
+    protected override Task<AuthenticateResult> HandleAuthenticateAsync()
+	{
+		if (!Request.Headers.ContainsKey("Authorization"))
+		{
+			return Task.FromResult(AuthenticateResult.Fail("Missing Authorization header"));
+		}
+        var identity = new GenericIdentity("test", "test");
+		return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(identity), null, "Test")));
+	}
 }
