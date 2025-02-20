@@ -3,7 +3,7 @@ using Sample.Domain;
 
 namespace Sample.Application.Subscriptions;
 
-public class MonitoringContextSubscriptions(ILogger<MonitoringContextSubscriptions> logger, IEventReader bus)
+public class MonitoringContextSubscriptions(ILogger<MonitoringContextSubscriptions> logger, IEventConsumer bus)
     : ISubscribeToContextEvents
 {
     private readonly ILogger logger = logger;

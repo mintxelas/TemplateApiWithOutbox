@@ -94,7 +94,7 @@ public static class StartupServicesExtensions
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddSingleton<IOutboxRepository, OutboxRepository>();
         services.AddSingleton<RepeatingTimer>();
-        services.AddSingleton<IEventReader, BusSubscriptionsWithOutbox>();
+        services.AddSingleton<IEventConsumer, BusSubscriptionsWithOutbox>();
         return services;
     }
 

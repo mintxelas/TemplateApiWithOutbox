@@ -41,7 +41,6 @@ public class MessagesController(IMessageRepository repository, IMediator mediato
     }
 
     [HttpPost]
-    [Authorize]
     public async Task<ActionResult<Guid>> Post([FromForm] string text)
     {
         var request = new CreateMessageRequest(text);

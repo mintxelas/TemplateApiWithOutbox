@@ -11,7 +11,7 @@ public class Message(Guid id, string text) : IExposeEvents
 
     public string Text { get; } = text;
 
-    public Message(string text) : this(default, text)
+    public Message(string text) : this(Guid.Empty, text)
     {
     }
 
