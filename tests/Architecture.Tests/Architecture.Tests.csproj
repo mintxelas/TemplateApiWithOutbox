@@ -27,4 +27,12 @@
         <Using Include="Xunit"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\Api\Sample.Api.csproj" />
+      <ProjectReference Include="..\..\src\Application\Sample.Application.csproj" />
+      <ProjectReference Include="..\..\src\Domain\Sample.Domain.csproj" />
+      <ProjectReference Include="..\..\src\Front\Sample.Front.csproj" />
+      <ProjectReference Include="..\..\src\Infrastructure\Sample.Infrastructure.csproj" />
+    </ItemGroup>
+
 </Project>
