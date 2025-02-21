@@ -1,4 +1,4 @@
-# SampleApiWithOutbox
+# SampleApiWithOutbox (WIP)
 
 Este repo es un ejemplo de cómo **yo** creo que hay que organizar una aplicación web, centrandome en el backend. 
 
@@ -24,7 +24,22 @@ Esta capa tiene dependencia de la capa de dominio pero nada más. Aquí se imple
 ## Infraestructura
 Esta capa tiene dependencia de la capa de dominio, pero no de la de aplicación. Se implementan los repositorios, clientes de service bus, proxys a otras apis... Cualquier cosa que dependa de una tecnología concreta. *Casi* siempre se trata de dependencias out-of-process. 
 
+## Front
+
+
+## API
+
 
 # Tests
 
-No hay tests del proyecto Front.
+(No hay tests del proyecto Front).
+
+## Tests de arquitectura
+
+Validan que las dependencias entre las capas de modelado son correctas (domain no depende de nada, application depende de domain...) 
+
+## Tests Unitarios
+
+
+## Tests de integración
+
