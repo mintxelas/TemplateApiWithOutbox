@@ -1,56 +1,30 @@
 # SampleApiWithOutbox
 
-***Nota:* README generado por ChatGPT (y mucha ayuda humana)**
+Este repo es un ejemplo de cómo **yo** creo que hay que organizar una aplicación web, centrandome en el backend. 
 
-Este repositorio implementa una API desarrollada con ASP.NET Core que utiliza los patrones Outbox y Backend for Frontend (BFF) para garantizar consistencia en la comunicación entre servicios y mejorar la seguridad en aplicaciones web.
+Se compone de un frontal (*Sample.Front*) que llama a una API interna mediante el patrón Back-For-Front. Es decir, la parte servidora del front hace de proxy a la API del back (*Sample.API*).
+La autenticación se hace contra un IDP (incluido en la solución por comodidad, proyecto *Idsrv4*). De cara al usuario, la autenticación se hace mediante cookies (*Strict-Same-Site*) y hacia la API del back usa el flujo *Machine-to-Machine*.
 
-## Arquitectura del Proyecto
+# Funcionalidad
 
-El proyecto está organizado en los siguientes directorios:
+Se trata de un mantenimiento de mensajes, como podrían ser los SMS. Es una excusa para representar el modelado orientado a Dominio en capas (proyectos *Sample.Domain*, *Sample.Application* y *Sample.Infrastructure*).
 
-- **src/**: Contiene el código fuente de la aplicación.
-  - **Api/**: Proyecto principal de la API del backend desarrollada con ASP.NET Core. Se ha diseñado siguiendo los principios de "clean architecture".
-  - **Front/**: Implementa el patrón Backend for Frontend (BFF) para gestionar la comunicación entre el front-end y la API del backend.
-- **tests/**: Contiene los proyectos de pruebas unitarias y de integración del backend.
+Cuando se procesa un mensaje, si contiene cierta palabra, se lanza un evento que es almacenado en un outbox para mantener la transaccionalidad en la base de datos. Luego, otro proceso va leyendo los mensajes del outbox y los entrega a los suscriptores (patrón Outbox).
+Los subscriptores solo están interesados en el evento *MatchingMessageReceived*, que  como ya se ha dicho es lanzado por el método *Process* del agregado *Message*.
 
-## Patrón Outbox
+# Capas
 
-En arquitecturas de microservicios, la comunicación asíncrona es esencial para mantener la consistencia entre los servicios. El patrón Outbox garantiza que las operaciones de base de datos y la publicación de mensajes se realicen de manera atómica, evitando inconsistencias.
+## Dominio
+Esta capa es la más protegida y por ello no depende de ningún otro proyecto.
+Aquí se definen los eventos y agregados de nuestro dominio (en este caso *MatchingMessageReceived* y *Message*), así como las interfaces necesarias cuya implementación se delega en otras capas (p.ej, *IMessageRepository*). 
 
-### Flujo de Trabajo:
+## Aplicación
+Esta capa tiene dependencia de la capa de dominio pero nada más. Aquí se implementan los comandos que, usando las implementaciones de la capa de infraestructura, realizan los casos de uso y reaccionan a los eventos.
 
-1. **Recepción de Solicitud**: Un cliente envía una solicitud HTTP a la API para crear un nuevo recurso.
-2. **Procesamiento en la API**:
-   - Se crea una nueva entidad en la base de datos.
-   - Se genera un evento asociado y se almacena en una tabla "outbox" dentro de la misma transacción de base de datos.
-3. **Procesamiento en Segundo Plano**:
-   - Un servicio en segundo plano monitorea la tabla "outbox" en busca de eventos pendientes.
-   - Al detectar un nuevo evento, el servicio lo publica en el sistema de mensajería.
-   - Si la publicación es exitosa, el evento se marca como procesado; de lo contrario, se reintentará en el siguiente ciclo.
+## Infraestructura
+Esta capa tiene dependencia de la capa de dominio, pero no de la de aplicación. Se implementan los repositorios, clientes de service bus, proxys a otras apis... Cualquier cosa que dependa de una tecnología concreta. *Casi* siempre se trata de dependencias out-of-process. 
 
-Este enfoque asegura la consistencia entre la base de datos y los mensajes enviados a otros servicios.
 
-## Patrón Backend for Frontend (BFF)
+# Tests
 
-El patrón Backend for Frontend (BFF) proporciona un back-end optimizado para cada tipo de front-end. En este caso, `Sample.Front` actúa como intermediario entre el front-end y los servicios back-end, ofreciendo beneficios como:
-
-- **Optimización de Respuestas**: Adaptando las respuestas según las necesidades del front-end.
-- **Simplicidad en el Mantenimiento**: Separando la lógica del front-end de los servicios internos.
-- **Seguridad Mejorada**: Centralizando la autenticación y reduciendo la exposición de los servicios back-end.
-
-## Autenticación y Seguridad
-
-El proyecto utiliza **autenticación basada en tokens JWT (JSON Web Tokens)**, gestionada por el BFF. Este enfoque mejora la seguridad al:
-
-- **Reducir la Superficie de Ataque**: El front-end se comunica solo con el BFF, sin acceso directo a los servicios internos.
-- **Gestionar Sesiones de Forma Centralizada**: Controlando la expiración y revocación de tokens.
-- **Implementar Medidas Adicionales**: Como protección contra ataques de fuerza bruta y validación de entradas.
-
-## Contribuciones
-
-Las contribuciones son bienvenidas. Si encuentras algún problema o tienes sugerencias, abre una "issue" o envía una "pull request".
-
-## Licencia
-
-Este proyecto está bajo la Licencia MIT.
-
+No hay tests del proyecto Front.

@@ -17,14 +17,15 @@ public class OutboxRepository(IOutboxDbContext dbContext) : IOutboxRepository
                     .OrderBy(oe => oe.Id))
         {
             outboxEvent.ProcessedDate = DateTimeOffset.Now;
-            dbContext.SaveChanges();
             yield return ToDomainEvent(outboxEvent);
+            dbContext.SaveChanges();
         }
     }
 
     private IDomainEvent ToDomainEvent(OutboxEvent outboxEvent)
     {
         var eventType = Type.GetType(outboxEvent.EventName);
+        if (eventType is null) throw new Exception($"Event type {outboxEvent.EventName} not found");
         var domainEvent = JsonSerializer.Deserialize(outboxEvent.Payload, eventType);
         return (IDomainEvent)domainEvent;
     }
