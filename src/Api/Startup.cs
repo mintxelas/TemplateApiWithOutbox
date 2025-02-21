@@ -28,7 +28,7 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
                 options.IncludeErrorDetails = environment.IsDevelopment();
             });
         services.AddControllers();
-        services.AddMediatorWithBehaviors();
+        services.AddCommandHandlers();
         services.AddVersionedApi(defaultApiVersion: MaximumApiVersion);
         services.AddSwaggerWithVersions("Sample Api", MinimumApiVersion, MaximumApiVersion);
         services.AddCustomConfiguration(configuration.GetSection("OutBox"));

@@ -4,7 +4,7 @@ using Sample.Domain;
 
 namespace Sample.Application.Subscriptions;
 
-public class NotificationsContextSubscriptions(ILogger<NotificationsContextSubscriptions> logger, IEventReader bus)
+public class NotificationsContextSubscriptions(ILogger<NotificationsContextSubscriptions> logger, IEventConsumer bus)
     : ISubscribeToContextEvents
 {
     private readonly ILogger logger = logger;

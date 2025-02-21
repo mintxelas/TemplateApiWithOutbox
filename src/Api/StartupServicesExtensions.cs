@@ -2,8 +2,6 @@
 using System.Linq;
 using Asp.Versioning;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
-using FluentValidation;
-using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +13,11 @@ using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Sample.Api.Middleware;
+using Sample.Application;
+using Sample.Application.CreateMessage;
+using Sample.Application.GetAllMessages;
+using Sample.Application.GetMessageById;
+using Sample.Application.ProcessMessage;
 using Sample.Application.Subscriptions;
 using Sample.Domain;
 using Sample.Infrastructure.Configuration;
@@ -94,7 +97,7 @@ public static class StartupServicesExtensions
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddSingleton<IOutboxRepository, OutboxRepository>();
         services.AddSingleton<RepeatingTimer>();
-        services.AddSingleton<IEventReader, BusSubscriptionsWithOutbox>();
+        services.AddSingleton<IEventConsumer, BusSubscriptionsWithOutbox>();
         return services;
     }
 
@@ -117,17 +120,12 @@ public static class StartupServicesExtensions
         return services;
     }
 
-    public static IServiceCollection AddMediatorWithBehaviors(this IServiceCollection services)
+    public static IServiceCollection AddCommandHandlers(this IServiceCollection services)
     {
-        services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(Application.Placeholder).Assembly));
-        services.Scan(scan => scan
-            .FromAssemblyOf<Application.Placeholder>()
-            .AddClasses(@class => @class.AssignableTo(typeof(IPipelineBehavior<,>)))
-            .AsImplementedInterfaces());
-        services.Scan(scan => scan
-            .FromAssemblyOf<Application.Placeholder>()
-            .AddClasses(@class => @class.AssignableTo(typeof(IValidator<>)))
-            .AsImplementedInterfaces());
+        services.AddSingleton<IRequestHandler<ProcessMessageRequest, ProcessMessageResponse>, ProcessMessageHandler>();
+        services.AddSingleton<IRequestHandler<GetMessageByIdRequest, GetMessageByIdResponse>, GetMessageByIdHandler>();
+        services.AddSingleton<IRequestHandler<GetAllMessagesRequest, GetAllMessagesResponse>, GetAllMessagesHandler>();
+        services.AddSingleton<IRequestHandler<CreateMessageRequest, CreateMessageResponse>, CreateMessageHandler>();
         return services;
     }
 

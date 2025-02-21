@@ -1,5 +1,4 @@
-﻿using MediatR;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Sample.Domain;
 
@@ -8,7 +7,7 @@ namespace Sample.Application.GetMessageById;
 public class GetMessageByIdHandler(IMessageRepository repository)
     : IRequestHandler<GetMessageByIdRequest, GetMessageByIdResponse>
 {
-    public async Task<GetMessageByIdResponse> Handle(GetMessageByIdRequest request, CancellationToken cancellationToken)
+    public async Task<GetMessageByIdResponse> Handle(GetMessageByIdRequest request, CancellationToken cancellationToken = default)
     {
         var message = await repository.GetById(request.MessageId);
         if (message is null)

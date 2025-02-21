@@ -7,7 +7,7 @@ using Sample.Infrastructure.Repositories;
 
 namespace Sample.Infrastructure.Subscriptions;
 
-public sealed class BusSubscriptionsWithOutbox : IEventReader
+public sealed class BusSubscriptionsWithOutbox : IEventConsumer
 {
     private static readonly ConcurrentDictionary<Type, List<Action<IDomainEvent>>> Subscribers 
         = new ConcurrentDictionary<Type, List<Action<IDomainEvent>>>();

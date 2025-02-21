@@ -1,8 +1,6 @@
-﻿using MediatR;
+﻿namespace Sample.Application.GetAllMessages;
 
-namespace Sample.Application.GetAllMessages;
-
-public class GetAllMessagesRequest : IRequest<GetAllMessagesResponse>
+public class GetAllMessagesRequest 
 {
         
 }
