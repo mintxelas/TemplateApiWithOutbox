@@ -27,3 +27,37 @@ Esta capa tiene dependencia de la capa de dominio, pero no de la de aplicación.
 # Tests de arquitectura
 
 Validan que las dependencias entre las capas de modelado son correctas (domain no depende de nada, application depende de domain...) 
+
+# Sistema de archivos
+
+Una carpeta *src* contiene los proyectos de producción y otra carpeta *tests* los proyectos de pruebas.
+Los proyectos de prueba se corresponden con los proyectos de producción (p.ej, *Sample.Api* y *Sample.Api.Tests*).
+Dentro de cada proyecto de test los archivos se corresponden generalmente con los archivos de clase correspondientes en producción pero añadiendo el sufijo *Should* (p.ej, *MessagesController.cs* con *MessagesControllerShould.cs*). 
+La idea es que la lectura del título del test sea más natural, p.ej:
+``MessagesControllerShould.return_all_repository_messages_on_get``
+
+# API
+
+La API usa varios componentes que solemos esperar en todas las apis. La parte específica de esta aplicación viene definida por los proyectos *Sample.Application* y *Sample.Infrastructure*, que a su vez hablan entre sí usando las definiciones de *Sample.Domain* (lenguaje ubicuo). 
+
+- Healthcheck
+
+- OpenTelemetry
+
+- LogContext Middleware 
+
+- Autenticación
+
+- Versionado
+
+- Swagger
+
+## Inyección de dependencias específicas de este dominio
+
+- Configuración personalizada y validación de la misma
+
+- Acceso a datos con Entity Framework
+
+- Bus y suscriptores
+
+- Manejadores de comandos
