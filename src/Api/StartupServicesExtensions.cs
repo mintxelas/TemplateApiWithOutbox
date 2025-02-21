@@ -113,10 +113,8 @@ public static class StartupServicesExtensions
 
     public static IServiceCollection AddSubscriptions(this IServiceCollection services)
     {
-        services.Scan(scan => scan
-            .FromAssemblyOf<Application.Placeholder>()
-            .AddClasses(@class => @class.AssignableTo<ISubscribeToContextEvents>())
-            .AsImplementedInterfaces());
+        services.AddSingleton<ISubscribeToContextEvents, MonitoringContextSubscriptions>();
+        services.AddSingleton<ISubscribeToContextEvents, NotificationsContextSubscriptions>();
         return services;
     }
 

@@ -1,6 +1,6 @@
 namespace Sample.Domain;
 
-public class PlaceHolder
+public sealed class PlaceHolder
 {
     
 }
