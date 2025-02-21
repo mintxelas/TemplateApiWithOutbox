@@ -22,4 +22,42 @@ public class ProjectReferenceTests
         
         Assert.True(result.IsSuccessful);
     }
+
+    [Fact]
+    public void Application_Should_Only_DependOnDomainProject()
+    {
+        var appAssembly =  typeof(Sample.Application.Placeholder).Assembly;
+        
+        var result = Types.InAssembly(appAssembly)
+            .Should()
+            .HaveDependencyOn("Sample.Domain")
+            .And()
+            .NotHaveDependencyOn("Sample.Front")
+            .And()
+            .NotHaveDependencyOn("Sample.Infrastructure")
+            .And()
+            .NotHaveDependencyOn("Sample.Api")
+            .GetResult();
+        
+        Assert.True(result.IsSuccessful);
+    }
+
+    [Fact]
+    public void Infrastructure_Should_Only_DependOnDomainProject()
+    {
+        var appAssembly =  typeof(Sample.Infrastructure.Placeholder).Assembly;
+        
+        var result = Types.InAssembly(appAssembly)
+            .Should()
+            .HaveDependencyOn("Sample.Domain")
+            .And()
+            .NotHaveDependencyOn("Sample.Front")
+            .And()
+            .NotHaveDependencyOn("Sample.Application")
+            .And()
+            .NotHaveDependencyOn("Sample.Api")
+            .GetResult();
+        
+        Assert.True(result.IsSuccessful);
+    }
 }
