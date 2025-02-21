@@ -1,4 +1,3 @@
-using MediatR;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Sample.Api.Models;
+using Sample.Application;
 using Sample.Application.CreateMessage;
 using Sample.Application.GetAllMessages;
 using Sample.Application.GetMessageById;

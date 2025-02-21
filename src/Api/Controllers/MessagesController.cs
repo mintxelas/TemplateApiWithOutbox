@@ -2,11 +2,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Asp.Versioning;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Sample.Api.Models;
+using Sample.Application;
 using Sample.Application.CreateMessage;
 using Sample.Application.GetAllMessages;
 using Sample.Application.GetMessageById;
@@ -19,7 +18,12 @@ namespace Sample.Api.Controllers;
 [ApiVersion("2.0")]
 [ApiController]
 [Route("[controller]")]
-public class MessagesController(IMessageRepository repository, IMediator mediator, ILogger<MessagesController> logger)
+public class MessagesController(IMessageRepository repository, 
+    IRequestHandler<ProcessMessageRequest, ProcessMessageResponse> processMessage,
+    IRequestHandler<GetMessageByIdRequest, GetMessageByIdResponse> getMessageById,
+    IRequestHandler<GetAllMessagesRequest, GetAllMessagesResponse> getAllMessages,
+    IRequestHandler<CreateMessageRequest, CreateMessageResponse> createMessage,
+    ILogger<MessagesController> logger)
     : ControllerBase
 {
     private readonly IMessageRepository repository = repository;
@@ -28,7 +32,7 @@ public class MessagesController(IMessageRepository repository, IMediator mediato
     public async Task<ActionResult<MessageDto[]>> GetAll()
     {
         var request = new GetAllMessagesRequest();
-        var response = await mediator.Send(request);
+        var response = await getAllMessages.Handle(request);
         return Ok(response.Messages.Select(ToDto));
     }
 
@@ -36,7 +40,7 @@ public class MessagesController(IMessageRepository repository, IMediator mediato
     public async Task<ActionResult<MessageDto>> Get([FromRoute] Guid id)
     {
         var request = new GetMessageByIdRequest(id);
-        var response = await mediator.Send(request);
+        var response = await getMessageById.Handle(request);
         return MessageByIdResponse((dynamic)response);
     }
 
@@ -44,7 +48,7 @@ public class MessagesController(IMessageRepository repository, IMediator mediato
     public async Task<ActionResult<Guid>> Post([FromForm] string text)
     {
         var request = new CreateMessageRequest(text);
-        var response = await mediator.Send(request);
+        var response = await createMessage.Handle(request);
         return CreateMessageResponse((dynamic)response);
     }
 
@@ -59,7 +63,7 @@ public class MessagesController(IMessageRepository repository, IMediator mediato
     private async Task<IActionResult> Put(string version, Guid id, string textToMatch)
     {
         var request = new ProcessMessageRequest(id, textToMatch);
-        var response = await mediator.Send(request);
+        var response = await processMessage.Handle(request);
         logger.LogInformation("Processed Put {version} with result '{description}'.", version, response.Description);
         return MessageProcessResponse((dynamic)response);
     }

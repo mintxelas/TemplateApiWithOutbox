@@ -1,5 +1,4 @@
 ﻿using System;
-using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 using Sample.Domain;
@@ -9,7 +8,7 @@ namespace Sample.Application.ProcessMessage;
 public class ProcessMessageHandler(IMessageRepository repository)
     : IRequestHandler<ProcessMessageRequest, ProcessMessageResponse>
 {
-    public async Task<ProcessMessageResponse> Handle(ProcessMessageRequest request, CancellationToken cancellationToken)
+    public async Task<ProcessMessageResponse> Handle(ProcessMessageRequest request, CancellationToken cancellationToken = default)
     {
         try
         {

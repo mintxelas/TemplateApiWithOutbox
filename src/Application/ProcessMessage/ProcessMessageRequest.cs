@@ -1,9 +1,8 @@
-﻿using MediatR;
-using System;
+﻿using System;
 
 namespace Sample.Application.ProcessMessage;
 
-public class ProcessMessageRequest(Guid messageId, string textToMatch) : IRequest<ProcessMessageResponse>
+public class ProcessMessageRequest(Guid messageId, string textToMatch)
 {
     public Guid MessageId { get; } = messageId;
     public string TextToMatch { get; } = textToMatch;

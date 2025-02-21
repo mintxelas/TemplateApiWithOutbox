@@ -1,8 +1,6 @@
-﻿using MediatR;
+﻿namespace Sample.Application.CreateMessage;
 
-namespace Sample.Application.CreateMessage;
-
-public class CreateMessageRequest(string text) : IRequest<CreateMessageResponse>
+public class CreateMessageRequest(string text) 
 {
     public string Text { get; } = text;
 }
