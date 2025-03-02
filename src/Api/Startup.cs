@@ -38,7 +38,7 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
         services.AddHealthChecks()
             .AddDbContextCheck<MessageDbContext>()
             .AddSelfCheck();
-        services.AddOpenTelemetryConfiguration(configuration);
+        services.AddOpenTelemetryConfiguration();
         services.ConfigureHttpClientDefaults(http =>
         {
             http.AddStandardResilienceHandler();

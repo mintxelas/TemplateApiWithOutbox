@@ -120,10 +120,10 @@ public static class StartupServicesExtensions
 
     public static IServiceCollection AddCommandHandlers(this IServiceCollection services)
     {
-        services.AddSingleton<IRequestHandler<ProcessMessageRequest, ProcessMessageResponse>, ProcessMessageHandler>();
-        services.AddSingleton<IRequestHandler<GetMessageByIdRequest, GetMessageByIdResponse>, GetMessageByIdHandler>();
-        services.AddSingleton<IRequestHandler<GetAllMessagesRequest, GetAllMessagesResponse>, GetAllMessagesHandler>();
-        services.AddSingleton<IRequestHandler<CreateMessageRequest, CreateMessageResponse>, CreateMessageHandler>();
+        services.AddScoped<IRequestHandler<ProcessMessageRequest, ProcessMessageResponse>, ProcessMessageHandler>();
+        services.AddScoped<IRequestHandler<GetMessageByIdRequest, GetMessageByIdResponse>, GetMessageByIdHandler>();
+        services.AddScoped<IRequestHandler<GetAllMessagesRequest, GetAllMessagesResponse>, GetAllMessagesHandler>();
+        services.AddScoped<IRequestHandler<CreateMessageRequest, CreateMessageResponse>, CreateMessageHandler>();
         return services;
     }
 
@@ -137,7 +137,7 @@ public static class StartupServicesExtensions
         ]);
     }
 
-    public static void AddOpenTelemetryConfiguration(this IServiceCollection services, IConfiguration configuration)
+    public static void AddOpenTelemetryConfiguration(this IServiceCollection services)
     {
         services.AddLogging(builder => builder.AddOpenTelemetry(logging =>
         {
@@ -159,6 +159,8 @@ public static class StartupServicesExtensions
                     //.AddGrpcClientInstrumentation()
                     .AddHttpClientInstrumentation();
             });
+
+        var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
         
         if (!string.IsNullOrWhiteSpace(configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]))
         {
