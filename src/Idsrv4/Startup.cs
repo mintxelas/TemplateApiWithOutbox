@@ -73,16 +73,16 @@ namespace Idsrv4
                     new TestUser
                     {
                         SubjectId = "818727",
-                        Username = "alice",
-                        Password = "alice",
+                        Username = "admin",
+                        Password = "admin",
                         Claims =
                         {
-                            new Claim(JwtClaimTypes.Name, "Alice Smith"),
-                            new Claim(JwtClaimTypes.GivenName, "Alice"),
+                            new Claim(JwtClaimTypes.Name, "Ronda Smith"),
+                            new Claim(JwtClaimTypes.GivenName, "Ronda"),
                             new Claim(JwtClaimTypes.FamilyName, "Smith"),
-                            new Claim(JwtClaimTypes.Email, "AliceSmith@email.com"),
+                            new Claim(JwtClaimTypes.Email, "RondaSmith@email.com"),
                             new Claim(JwtClaimTypes.EmailVerified, "true", ClaimValueTypes.Boolean),
-                            new Claim(JwtClaimTypes.WebSite, "http://alice.com"),
+                            new Claim(JwtClaimTypes.WebSite, "http://ronda.com"),
                             new Claim(JwtClaimTypes.Address, JsonSerializer.Serialize(new
                             {
                                 street_address = "One Hacker Way",
