@@ -12,11 +12,11 @@ namespace Sample.Infrastructure.Repositories;
 public class MessageRepository(MessageDbContext dbContext) : IMessageRepository
 {
     public Task<Message[]> GetAll()
-        => Task.FromResult(dbContext.MessageRecords.Select(ToMessage).ToArray());
+        => Task.FromResult(dbContext.MessageRecords.Select(MessageExtensions.ToMessage).ToArray());
 
     public Task<Message> GetById(Guid id)
-        => Task.FromResult(ToMessage(dbContext.MessageRecords
-            .SingleOrDefault(m => m.Id == id)));
+        => Task.FromResult(dbContext.MessageRecords
+            .SingleOrDefault(m => m.Id == id).ToMessage());
 
     public async Task<Message> Save(Message message)
     {
@@ -31,7 +31,7 @@ public class MessageRepository(MessageDbContext dbContext) : IMessageRepository
         EntityEntry<MessageRecord> entityEntry;
         if (message.Id == Guid.Empty)
         {
-            entityEntry = await dbContext.MessageRecords.AddAsync(ToRecord(message));
+            entityEntry = await dbContext.MessageRecords.AddAsync(message.ToRecord());
         }
         else
         {
@@ -40,7 +40,7 @@ public class MessageRepository(MessageDbContext dbContext) : IMessageRepository
             entityEntry = dbContext.MessageRecords.Update(record);
         }
 
-        return ToMessage(entityEntry.Entity);
+        return entityEntry.Entity.ToMessage();
     }
 
     private async Task AddOutboxEvents(Message message)
@@ -60,12 +60,17 @@ public class MessageRepository(MessageDbContext dbContext) : IMessageRepository
         withEvents.ClearPendingEvents();
     }
 
-    private Message ToMessage(MessageRecord record)
+    
+}
+
+internal static class MessageExtensions
+{
+    internal static Message ToMessage(this MessageRecord record)
         => record is null
             ? null
             : new Message(record.Id, record.Text);
 
-    private MessageRecord ToRecord(Message message)
+    internal static MessageRecord ToRecord(this Message message)
         => new MessageRecord
         {
             Id = message.Id == Guid.Empty ? Guid.NewGuid() : message.Id,
