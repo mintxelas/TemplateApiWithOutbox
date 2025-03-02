@@ -45,31 +45,37 @@ La idea es que la lectura del título del test sea más natural, p.ej:
 
 La API usa varios componentes que solemos esperar en todas las apis. La parte específica de esta aplicación viene definida por los proyectos *Sample.Application* y *Sample.Infrastructure*, que a su vez hablan entre sí usando las definiciones de *Sample.Domain* (lenguaje ubicuo). 
 
-- Healthcheck
+- ## Healthcheck
 
 Este endpoint se ha implementado usando la librería estándar de aspnet. Responde a la url */health* con algo más de información de la de por defecto. Se le ha añadido el número de versión de la aplicación, que a menudo viene bien para el troubleshooting. 
 Se suelen añadir aquí dependencias de servicios externos de modo que la api puede estar arrancada, pero con una funcionalidad reducida si alguna dependencia no está disponible.  
 
-- OpenTelemetry
+- ## OpenTelemetry
 
 El estándar de trazabilidad a día de hoy es OpenTelemetry. Permite enlazar llamadas entre sistemas, tiene convenciones para saber si una traza se va a registrar o no (es fácil saturar un servicio de trazas si no se hace sampling), y soporta distintos formatos de identificadores de correlación. 
 
-- LogContext Middleware 
+- ## LogContext Middleware 
 
 Una cosa habitual es querer que alguna información de cada petición aparezca en todos los logs (p.ej: el id de correlación). La manera menos intrusiva de hacer esto es usando un middleware en la pipeline de la API.
 
-- Autenticación
+- ## Autenticación
 
-- Versionado
+La API utiliza un token JWT que llega del Front usando el flujo *machine-to-machine*. El Front usa autenticación basada en cookies hacia el usuario.
 
-- Swagger
+- ## Versionado
+
+A modo de ejemplo se implementan 2 versiones de un endpoint. Podemos indicar la versión por cabecera o querystring. Podría añadirse por path o media-type.
+
+- ## Swagger
+
+Se genera el esquema a partir del código por cada versión de la API y se tiene en cuenta la autenticación.
 
 ## Inyección de dependencias específicas de este dominio
 
-- Configuración personalizada y validación de la misma
+- ### Configuración personalizada y validación de la misma
 
-- Acceso a datos con Entity Framework
+- ### Acceso a datos con Entity Framework
 
-- Bus y suscriptores
+- ### Bus y suscriptores
 
-- Manejadores de comandos
+- ### Manejadores de comandos
