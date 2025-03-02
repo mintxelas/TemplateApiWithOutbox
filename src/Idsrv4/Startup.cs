@@ -26,12 +26,11 @@ namespace Idsrv4
                     options.Events.RaiseInformationEvents = true;
                     options.Events.RaiseSuccessEvents = true;
                 })
-                .AddInMemoryIdentityResources(new IdentityResource[]
-                {
+                .AddInMemoryIdentityResources([
                     new IdentityResources.OpenId(),
                     new IdentityResources.Profile(),
                     new IdentityResources.Email()
-                })
+                ])
                 .AddInMemoryApiScopes(new List<ApiScope>()
                 {
                     new ApiScope("internal-api")
@@ -43,9 +42,8 @@ namespace Idsrv4
                         Scopes = { "internal-api" }
                     }
                 })
-                .AddInMemoryClients(new Client[]
-                {
-                     new Client()
+                .AddInMemoryClients([
+                    new Client()
                      {
                         ClientId = "internal-api",
                         ClientName = "Interactive client with short token lifetime (Code with PKCE)",
@@ -68,8 +66,8 @@ namespace Idsrv4
                         AccessTokenLifetime = 20
 
                      }
-                })
-                .AddTestUsers(new List<TestUser> {
+                ])
+                .AddTestUsers([
                     new TestUser
                     {
                         SubjectId = "818727",
@@ -82,7 +80,7 @@ namespace Idsrv4
                             new Claim(JwtClaimTypes.FamilyName, "Smith"),
                             new Claim(JwtClaimTypes.Email, "RondaSmith@email.com"),
                             new Claim(JwtClaimTypes.EmailVerified, "true", ClaimValueTypes.Boolean),
-                            new Claim(JwtClaimTypes.WebSite, "http://ronda.com"),
+                            new Claim(JwtClaimTypes.WebSite, "https://rondasmith.com"),
                             new Claim(JwtClaimTypes.Address, JsonSerializer.Serialize(new
                             {
                                 street_address = "One Hacker Way",
@@ -92,7 +90,7 @@ namespace Idsrv4
                             }), IdentityServerConstants.ClaimValueTypes.Json)
                         }
                     }
-                })
+                ])
                 .AddDeveloperSigningCredential(persistKey: false);
         }
 
