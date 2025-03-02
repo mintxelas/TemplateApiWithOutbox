@@ -31,11 +31,11 @@ namespace Idsrv4
                     new IdentityResources.Profile(),
                     new IdentityResources.Email()
                 ])
-                .AddInMemoryApiScopes(new List<ApiScope>()
+                .AddInMemoryApiScopes(new List<ApiScope>
                 {
                     new ApiScope("internal-api")
                 })
-                .AddInMemoryApiResources(new List<ApiResource>()
+                .AddInMemoryApiResources(new List<ApiResource>
                 {
                     new ApiResource("internal-api", "Internal API")
                     {
@@ -43,7 +43,7 @@ namespace Idsrv4
                     }
                 })
                 .AddInMemoryClients([
-                    new Client()
+                    new Client
                      {
                         ClientId = "internal-api",
                         ClientName = "Interactive client with short token lifetime (Code with PKCE)",
